@@ -1700,7 +1700,7 @@
   // ══════════════════════════════════════════════════════════════
   // ★★★  ضع رابط نشر Apps Script هنا  ★★★
   // ══════════════════════════════════════════════════════════════
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwXxUZGnyy29IXtJmBV7SgnUcQwSb-hHZnDUYZboiyHf-9AiZohhG3ssfUDyXXKVQw/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbyLZHFVW7S4NFcPJW9hweRZ0BMCUjiigBhCVce1nmhr2ZHDf5ZtM0E2vx5UEVxARLxg/exec';
 
   // تحديث localStorage دائماً بالرابط المضمّن
   try { localStorage.setItem('jasoor_gas_url', GAS_URL); } catch(e){}
@@ -2126,7 +2126,7 @@
   function closeCtxMenu(){
     document.getElementById('ctxMenu').classList.add('gone');
     document.getElementById('ctxBackdrop').classList.add('gone');
-    _ctxStudent = null;
+    // لا نمسح _ctxStudent هنا — المودالات تحتاجه بعد إغلاق القائمة
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -2144,6 +2144,7 @@
 
   function closeEditModal(){
     document.getElementById('editOverlay').classList.add('gone');
+    _ctxStudent = null;
   }
 
   function saveEditStudent(){
@@ -2152,20 +2153,20 @@
     const section = document.getElementById('editSection').value.trim();
     const notes   = document.getElementById('editNotes').value.trim();
     if(!name){ alert('الاسم لا يمكن أن يكون فارغاً'); return; }
-    closeEditModal();
+    const studentId = _ctxStudent.id; // احفظ الـ id قبل أي إغلاق
+    document.getElementById('editOverlay').classList.add('gone');
+    _ctxStudent = null;
     showMsg('جاري حفظ التعديلات…', true);
-    gasCall('editStudent', { id: _ctxStudent.id, name, section, notes })
+    gasCall('editStudent', { id: studentId, name, section, notes })
       .then(msg => {
-        // تحديث الـ state المحلي
-        const s = all.find(x => x.id === _ctxStudent.id);
+        const s = all.find(x => x.id === studentId);
         if(s){ s.name = name; s.section = section; s.notes = notes; }
         [present, absent].forEach(arr => {
-          const ss = arr.find(x => x.id === _ctxStudent.id);
+          const ss = arr.find(x => x.id === studentId);
           if(ss){ ss.name = name; ss.section = section; }
         });
         filterAndRender();
         showMsg(msg || 'تم تحديث البيانات ✓', true);
-        _ctxStudent = null;
       })
       .catch(e => showMsg('خطأ: ' + e.message, false));
   }
@@ -2191,25 +2192,27 @@
 
   function closeTransferModal(){
     document.getElementById('transferOverlay').classList.add('gone');
+    _ctxStudent = null;
   }
 
   function saveTransferStudent(){
     if(!_ctxStudent) return;
     const newSection = document.getElementById('transferSection').value;
     if(!newSection) return;
-    closeTransferModal();
+    const studentId = _ctxStudent.id;
+    document.getElementById('transferOverlay').classList.add('gone');
+    _ctxStudent = null;
     showMsg('جاري نقل الطالب…', true);
-    gasCall('transferStudent', _ctxStudent.id, newSection)
+    gasCall('transferStudent', studentId, newSection)
       .then(msg => {
-        const s = all.find(x => x.id === _ctxStudent.id);
+        const s = all.find(x => x.id === studentId);
         if(s) s.section = newSection;
         [present, absent].forEach(arr => {
-          const ss = arr.find(x => x.id === _ctxStudent.id);
+          const ss = arr.find(x => x.id === studentId);
           if(ss) ss.section = newSection;
         });
         filterAndRender();
         showMsg(msg || 'تم نقل الطالب ✓', true);
-        _ctxStudent = null;
       })
       .catch(e => showMsg('خطأ: ' + e.message, false));
   }
@@ -2226,22 +2229,23 @@
 
   function closeDeleteModal(){
     document.getElementById('deleteOverlay').classList.add('gone');
+    _ctxStudent = null;
   }
 
   function confirmDeleteStudent(){
     if(!_ctxStudent) return;
-    const id = _ctxStudent.id;
-    closeDeleteModal();
+    const studentId = _ctxStudent.id;
+    document.getElementById('deleteOverlay').classList.add('gone');
+    _ctxStudent = null;
     showMsg('جاري الحذف وإعادة الفهرسة…', true);
-    gasCall('deleteStudent', id)
+    gasCall('deleteStudent', studentId)
       .then(msg => {
-        all    = all.filter(s => s.id !== id);
-        present = present.filter(s => s.id !== id);
-        absent  = absent.filter(s => s.id !== id);
+        all     = all.filter(s => s.id !== studentId);
+        present = present.filter(s => s.id !== studentId);
+        absent  = absent.filter(s => s.id !== studentId);
         document.getElementById('stat-total').textContent = all.length;
         filterAndRender();
         showMsg(msg || 'تم الحذف وإعادة الترقيم ✓', true);
-        _ctxStudent = null;
       })
       .catch(e => showMsg('خطأ: ' + e.message, false));
   }

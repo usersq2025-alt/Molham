@@ -1,0 +1,2745 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --font: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+      --accent:       #e53e3e;
+      --accent-dark:  #c53030;
+      --accent-alpha: rgba(229,62,62,.13);
+      --green:        #16a34a;
+      --green-bg:     #f0fdf4;
+      --green-border: #bbf7d0;
+      --green-badge:  #dcfce7;
+      --green-text:   #15803d;
+      --red:          #dc2626;
+      --red-bg:       #fff5f5;
+      --red-border:   #fecaca;
+      --red-badge:    #fee2e2;
+      --red-text:     #b91c1c;
+      --bg:           #f4f6f9;
+      --surface:      #ffffff;
+      --surface-2:    #f8fafc;
+      --border:       rgba(0,0,0,.07);
+      --border-med:   rgba(0,0,0,.11);
+      --text-1:       #111827;
+      --text-2:       #6b7280;
+      --text-3:       #9ca3af;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:    0 4px 14px rgba(0,0,0,.08);
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+    }
+
+    [data-theme="dark"] {
+      --accent:       #fc8181;
+      --accent-dark:  #f56565;
+      --accent-alpha: rgba(252,129,129,.15);
+      --green:        #4ade80;
+      --green-bg:     rgba(20,83,45,.3);
+      --green-border: rgba(20,83,45,.55);
+      --green-badge:  rgba(20,83,45,.4);
+      --green-text:   #86efac;
+      --red:          #f87171;
+      --red-bg:       rgba(127,29,29,.3);
+      --red-border:   rgba(127,29,29,.55);
+      --red-badge:    rgba(127,29,29,.4);
+      --red-text:     #fca5a5;
+      --bg:           #0d1117;
+      --surface:      #161b22;
+      --surface-2:    #1e2530;
+      --border:       rgba(255,255,255,.06);
+      --border-med:   rgba(255,255,255,.10);
+      --text-1:       #e6edf3;
+      --text-2:       #8b949e;
+      --text-3:       #484f58;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.25);
+      --shadow-md:    0 4px 14px rgba(0,0,0,.35);
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{height:100%}
+
+    body{
+      font-family:var(--font);
+      background:var(--bg);
+      color:var(--text-1);
+      min-height:100%;
+      padding-bottom:130px;
+      transition:background .25s,color .25s;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+      -webkit-font-smoothing:antialiased;
+      font-size:16px;
+      line-height:1.5;
+    }
+
+    /* ══════════════════════════════════════
+       HEADER – Responsive two-row layout
+       ══════════════════════════════════════ */
+    .hdr{
+      position:sticky;top:0;z-index:100;
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+      padding:0 22px;
+    }
+
+    .hdr-row{
+      display:flex;align-items:center;
+      justify-content:space-between;
+      height:64px;gap:10px;
+    }
+
+    /* On small screens, allow header to grow and wrap */
+    @media(max-width:640px){
+      .hdr{padding:0 14px}
+      .hdr-row{height:auto;flex-wrap:wrap;padding:10px 0;gap:8px}
+    }
+
+    .logo{display:flex;align-items:center;gap:11px;flex-shrink:0}
+
+    .logo-mark{
+      width:38px;height:38px;
+      background:var(--accent);
+      border-radius:var(--r-sm);
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;font-weight:700;color:#fff;
+    }
+
+    .logo-name{font-size:17px;font-weight:700;color:var(--text-1)}
+
+    /* Right side of header: groups controls */
+    .hdr-right{display:flex;align-items:center;gap:9px;flex-shrink:0}
+
+    /* On very small screens, controls wrap to a second row */
+    @media(max-width:640px){
+      .hdr-right{
+        width:100%;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+        gap:7px;
+      }
+    }
+
+    /* shared control style */
+    .ctrl{
+      height:40px;
+      background:var(--surface-2);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-sm);
+      font-family:var(--font);
+      font-size:14px;font-weight:500;
+      color:var(--text-1);
+      padding:0 12px;
+      outline:none;
+      transition:border-color .18s,box-shadow .18s;
+      cursor:pointer;
+      appearance:none;-webkit-appearance:none;
+    }
+    .ctrl:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-alpha)}
+
+    /* Date picker wrapper with "today" indicator */
+    .date-wrap{position:relative;display:flex;align-items:center;}
+
+    input[type="date"].ctrl{
+      min-width:140px;
+      padding-left:10px;
+    }
+
+    /* Flashing "اليوم" badge shown when selected date = today */
+    .today-badge{
+      position:absolute;
+      left:-2px;
+      top:50%;transform:translateY(-50%);
+      background:var(--accent);
+      color:#fff;
+      font-size:10px;font-weight:700;
+      padding:2px 6px;
+      border-radius:5px;
+      pointer-events:none;
+      display:none;
+      z-index:10;
+    }
+    /* When today is active push badge to top-left corner of input */
+    .date-wrap.is-today .today-badge{display:block}
+    .date-wrap.is-today input[type="date"].ctrl{
+      border-color:var(--accent);
+      box-shadow:0 0 0 2px var(--accent-alpha);
+    }
+
+    /* "Go to today" button */
+    .today-btn{
+      height:40px;padding:0 11px;
+      background:var(--surface-2);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-sm);
+      font-family:var(--font);font-size:13px;font-weight:600;
+      color:var(--text-2);cursor:pointer;
+      transition:all .18s;
+      white-space:nowrap;
+    }
+    .today-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+    .dash-btn{
+      display:flex;align-items:center;gap:8px;
+      background:var(--surface-2);
+      border:1px solid var(--border-med);
+      color:var(--text-1);
+      padding:0 13px;
+      height:40px;
+      border-radius:var(--r-sm);
+      font-weight:600;font-size:14px;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .dash-btn.active{
+      background:var(--accent);color:#fff;border-color:var(--accent);
+    }
+
+    .sel-wrap{position:relative}
+    .sel-wrap select.ctrl{padding-left:28px}
+    .sel-arrow{
+      position:absolute;left:8px;top:50%;transform:translateY(-50%);
+      pointer-events:none;color:var(--text-3);display:flex;
+    }
+
+    .theme-btn{
+      width:40px;height:40px;
+      border-radius:var(--r-sm);
+      border:1px solid var(--border-med);
+      background:var(--surface-2);
+      color:var(--text-2);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;flex-shrink:0;
+      transition:background .18s,color .18s;
+    }
+    .theme-btn:hover{background:var(--surface);color:var(--text-1)}
+
+    /* ── STATS ── */
+    .stats{
+      display:flex;gap:10px;padding:16px 22px;
+      flex-wrap:wrap;
+    }
+
+    @media(max-width:640px){
+      .stats{padding:12px 14px;gap:8px}
+    }
+
+    .stat{
+      flex:1;min-width:130px;
+      display:flex;align-items:center;gap:14px;
+      padding:14px 16px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--r-md);
+      box-shadow:var(--shadow-sm);
+    }
+
+    @media(max-width:400px){
+      .stat{padding:12px 12px;gap:10px}
+    }
+
+    .stat-ico{
+      width:44px;height:44px;
+      border-radius:var(--r-sm);
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;
+    }
+    .stat-ico svg{width:19px;height:19px}
+    .stat-ico.g{background:var(--green-badge);color:var(--green-text)}
+    .stat-ico.r{background:var(--red-badge);color:var(--red-text)}
+    .stat-ico.b{background:rgba(59,130,246,0.1);color:#3b82f6}
+
+    .stat-num{font-size:28px;font-weight:700;line-height:1}
+    .stat-num.g{color:var(--green-text)}
+    .stat-num.r{color:var(--red-text)}
+    .stat-lbl{font-size:13px;font-weight:500;color:var(--text-2);margin-top:4px}
+
+    .pct{
+      margin-right:auto;
+      font-size:12px;font-weight:600;
+      padding:3px 10px;border-radius:20px;
+    }
+    .pct.g{background:var(--green-badge);color:var(--green-text)}
+    .pct.r{background:var(--red-badge);color:var(--red-text)}
+
+    /* ══════════════════════════════════════
+       TOOLBAR + QUICK-ACTION BUTTONS
+       ══════════════════════════════════════ */
+    .toolbar{
+      display:flex;align-items:center;
+      flex-wrap:wrap;
+      gap:9px;
+      padding:0 22px 14px;
+    }
+
+    @media(max-width:640px){
+      .toolbar{padding:0 14px 12px}
+    }
+
+    .srch-wrap{flex:1;min-width:160px;position:relative}
+    .srch-ico{
+      position:absolute;right:12px;top:50%;transform:translateY(-50%);
+      color:var(--text-3);pointer-events:none;display:flex;
+    }
+    .srch{
+      width:100%;height:42px;
+      background:var(--surface);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-sm);
+      font-family:var(--font);font-size:15px;
+      color:var(--text-1);padding:0 40px 0 12px;outline:none;
+      transition:border-color .18s,box-shadow .18s;
+    }
+    .srch::placeholder{color:var(--text-3)}
+    .srch:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-alpha)}
+
+    /* Quick-action buttons: تحديد الكل / إلغاء تحديد الكل */
+    .qa-wrap{display:flex;gap:7px;flex-shrink:0}
+
+    .qa-btn{
+      height:42px;padding:0 13px;
+      border-radius:var(--r-sm);
+      border:1px solid;
+      font-family:var(--font);font-size:13px;font-weight:600;
+      cursor:pointer;
+      display:flex;align-items:center;gap:6px;
+      transition:opacity .15s,transform .12s;
+      white-space:nowrap;
+    }
+    .qa-btn:active{transform:scale(.97)}
+    .qa-btn.qa-g{
+      background:var(--green-bg);
+      border-color:var(--green-border);
+      color:var(--green-text);
+    }
+    .qa-btn.qa-r{
+      background:var(--red-bg);
+      border-color:var(--red-border);
+      color:var(--red-text);
+    }
+    .qa-btn svg{width:14px;height:14px}
+
+    @media(max-width:520px){
+      /* Show only icons on very small screens */
+      .qa-btn .qa-lbl{display:none}
+      .qa-btn{padding:0 11px;width:42px;justify-content:center}
+    }
+
+    /* tabs */
+    .tabs{
+      display:none;
+      background:var(--surface-2);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-sm);
+      padding:4px;gap:4px;flex-shrink:0;
+    }
+    @media(max-width:767px){.tabs{display:flex}}
+
+    .tab{
+      height:34px;padding:0 13px;
+      border-radius:6px;border:none;
+      background:transparent;
+      font-family:var(--font);font-size:14px;font-weight:600;
+      color:var(--text-2);cursor:pointer;white-space:nowrap;
+      transition:background .14s,color .14s;
+    }
+    .tab.ag{background:var(--green-badge);color:var(--green-text)}
+    .tab.ar{background:var(--red-badge);color:var(--red-text)}
+
+    /* ══════════════════════════════════════
+       DASHBOARD LAYOUT
+       ══════════════════════════════════════ */
+    #dashboardUI{
+      padding:0 22px 40px;
+      animation:fadeIn .3s ease-out;
+    }
+
+    @media(max-width:640px){#dashboardUI{padding:0 14px 40px}}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Dashboard meta bar: date range + overall rate */
+    .dash-meta{
+      display:flex;align-items:center;flex-wrap:wrap;gap:10px;
+      margin-bottom:18px;
+      padding:12px 16px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--r-md);
+      box-shadow:var(--shadow-sm);
+    }
+    .dash-meta-item{
+      display:flex;align-items:center;gap:7px;
+      font-size:13px;font-weight:500;color:var(--text-2);
+    }
+    .dash-meta-item svg{width:15px;height:15px;color:var(--accent);flex-shrink:0}
+    .dash-meta-val{font-weight:700;color:var(--text-1)}
+    .dash-meta-divider{width:1px;height:20px;background:var(--border-med);flex-shrink:0}
+    @media(max-width:480px){.dash-meta-divider{display:none}}
+
+    .dash-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+      gap:18px;
+    }
+
+    .dash-card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--r-lg);
+      padding:22px;
+      box-shadow:var(--shadow-sm);
+    }
+    .dash-card-title{
+      font-size:15px;font-weight:700;
+      margin-bottom:18px;
+      display:flex;align-items:center;gap:9px;
+      color:var(--text-1);
+    }
+    .dash-card-title svg{width:17px;color:var(--accent);flex-shrink:0}
+
+    .chart-container{
+      position:relative;
+      height:240px;
+      width:100%;
+    }
+
+    @media(max-width:400px){
+      .chart-container{height:200px}
+    }
+
+    /* No-data placeholder */
+    .no-data-placeholder{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      height:200px;gap:10px;color:var(--text-3);
+    }
+    .no-data-placeholder svg{width:40px;height:40px;opacity:.4}
+    .no-data-placeholder p{font-size:14px;font-weight:500}
+
+    .top-list{list-style:none}
+    .top-item{
+      display:flex;align-items:center;
+      padding:11px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .top-item:last-child{border-bottom:none}
+    .top-rank{
+      width:26px;height:26px;
+      background:var(--surface-2);
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:700;color:var(--text-2);
+      margin-left:11px;flex-shrink:0;
+    }
+    .top-name{flex:1;font-size:14px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .top-val{font-size:12px;font-weight:700;color:var(--red);background:var(--red-badge);padding:2px 8px;border-radius:6px;white-space:nowrap}
+
+    /* ── COLUMNS ── */
+    .cols{display:flex;gap:14px;padding:0 22px}
+    @media(max-width:767px){.cols{padding:0 14px}}
+
+    .col{flex:1;min-width:0}
+
+    .col-hd{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:12px;padding:0 2px;
+    }
+    .col-title{
+      display:flex;align-items:center;gap:7px;
+      font-size:12px;font-weight:600;
+      color:var(--text-2);
+      text-transform:uppercase;letter-spacing:.06em;
+    }
+    .dot{width:7px;height:7px;border-radius:50%}
+    .dot.g{background:var(--green-text)}
+    .dot.r{background:var(--red-text)}
+
+    .col-right{display:flex;align-items:center;gap:9px}
+    .col-n{font-size:21px;font-weight:700}
+    .col-n.g{color:var(--green-text)}
+    .col-n.r{color:var(--red-text)}
+
+    .rst-btn{
+      height:30px;padding:0 11px;
+      border-radius:7px;
+      border:1px solid var(--border-med);
+      background:var(--surface);
+      font-family:var(--font);font-size:12px;font-weight:600;
+      color:var(--text-2);cursor:pointer;
+      transition:border-color .14s,color .14s;
+    }
+    .rst-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* ── STUDENT CARDS ── */
+    .s-list{display:flex;flex-direction:column;gap:8px}
+
+    .s-card{
+      display:flex;align-items:center;gap:13px;
+      padding:13px 14px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--r-md);
+      cursor:pointer;
+      box-shadow:var(--shadow-sm);
+      user-select:none;
+      animation:fadeUp .17s ease-out both;
+      transition:border-color .15s,background .15s,box-shadow .15s,transform .12s;
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+    .s-card:active{transform:scale(.98)}
+    .s-card.hg:hover{border-color:var(--green-border);background:var(--green-bg)}
+    .s-card.hr:hover{border-color:var(--red-border);background:var(--red-bg)}
+
+    .av{
+      width:42px;height:42px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:14px;font-weight:700;flex-shrink:0;letter-spacing:.2px;
+    }
+    .av.g{background:var(--green-badge);color:var(--green-text)}
+    .av.r{background:var(--red-badge);color:var(--red-text)}
+
+    .card-body{flex:1;min-width:0}
+    .card-name{
+      font-size:15px;font-weight:600;color:var(--text-1);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .card-sec{font-size:12px;font-weight:500;color:var(--text-3);margin-top:2px}
+
+    .card-act{
+      width:32px;height:32px;border-radius:8px;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      transition:transform .14s;
+    }
+    .card-act svg{width:14px;height:14px}
+    .card-act.g{background:var(--green-badge);color:var(--green-text)}
+    .card-act.r{background:var(--red-badge);color:var(--red-text)}
+
+    .s-card:hover .card-act{transform:translateX(3px)}
+
+    /* ── EMPTY ── */
+    .empty{
+      display:flex;flex-direction:column;align-items:center;
+      padding:48px 20px;gap:9px;
+    }
+    .empty-ico{
+      width:50px;height:50px;border-radius:50%;
+      background:var(--surface-2);border:1px solid var(--border-med);
+      display:flex;align-items:center;justify-content:center;margin-bottom:4px;
+    }
+    .empty-ico svg{width:22px;height:22px;color:var(--text-3)}
+    .empty-t{font-size:15px;font-weight:600;color:var(--text-2)}
+    .empty-s{font-size:13px;color:var(--text-3)}
+
+    /* ── LOADING ── */
+    #loading{
+      display:flex;flex-direction:column;align-items:center;
+      justify-content:center;min-height:280px;gap:16px;
+    }
+    .spin{
+      width:32px;height:32px;
+      border:2.5px solid var(--border-med);
+      border-top-color:var(--accent);
+      border-radius:50%;
+      animation:rot .7s linear infinite;
+    }
+    @keyframes rot{to{transform:rotate(360deg)}}
+    .load-t{font-size:14px;font-weight:500;color:var(--text-2)}
+
+    /* ── SAVE BAR ── */
+    .save-bar{
+      position:fixed;bottom:0;left:0;right:0;
+      padding:12px 22px 24px;
+      background:linear-gradient(to top,var(--bg) 60%,transparent);
+      pointer-events:none;z-index:200;
+    }
+    .save-inner{
+      max-width:480px;margin:0 auto;
+      pointer-events:all;
+      transform:translateY(80px);opacity:0;
+      transition:transform .3s cubic-bezier(.34,1.4,.64,1),opacity .22s;
+    }
+    .save-inner.vis{transform:none;opacity:1}
+
+    .save-btn{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      width:100%;height:54px;
+      background:var(--accent);color:#fff;
+      border:none;border-radius:var(--r-lg);
+      font-family:var(--font);font-size:15px;font-weight:700;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(229,62,62,.36);
+      transition:background .14s,box-shadow .14s,transform .12s;
+    }
+    .save-btn svg{width:18px;height:18px}
+    .save-btn:hover{background:var(--accent-dark);box-shadow:0 8px 24px rgba(229,62,62,.44)}
+    .save-btn:active{transform:scale(.98)}
+    .save-btn:disabled{opacity:.72;cursor:not-allowed}
+
+    #statusMsg{
+      text-align:center;font-size:13px;font-weight:600;
+      padding:8px 14px;border-radius:var(--r-sm);
+      margin-top:8px;display:none;
+    }
+    #statusMsg.ok{background:var(--green-badge);color:var(--green-text)}
+    #statusMsg.er{background:var(--red-badge);color:var(--red-text)}
+
+    .dim{opacity:.38;pointer-events:none;transition:opacity .3s}
+    .gone{display:none!important}
+    @media(max-width:767px){.mob-hide{display:none}}
+
+    /* ══════════════════════════════════════
+       CONTEXT MENU – قائمة اللمسة المطولة
+       ══════════════════════════════════════ */
+    .ctx-menu{
+      position:fixed;z-index:9000;
+      background:var(--surface);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-md);
+      box-shadow:0 8px 32px rgba(0,0,0,.18);
+      min-width:200px;
+      overflow:hidden;
+      animation:ctxPop .15s ease-out;
+    }
+    @keyframes ctxPop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+    .ctx-header{
+      padding:11px 15px 9px;
+      border-bottom:1px solid var(--border);
+      background:var(--surface-2);
+    }
+    .ctx-name{font-size:13px;font-weight:700;color:var(--text-1)}
+    .ctx-sec{font-size:11px;color:var(--text-3);margin-top:1px}
+    .ctx-item{
+      display:flex;align-items:center;gap:11px;
+      padding:11px 15px;
+      font-size:13px;font-weight:600;
+      cursor:pointer;
+      transition:background .13s;
+      color:var(--text-1);
+    }
+    .ctx-item:hover{background:var(--surface-2)}
+    .ctx-item svg{width:15px;height:15px;flex-shrink:0}
+    .ctx-item.danger{color:var(--red)}
+    .ctx-item.danger:hover{background:var(--red-bg)}
+    .ctx-backdrop{
+      position:fixed;inset:0;z-index:8999;
+      background:rgba(0,0,0,.18);
+    }
+
+    /* ══════════════════════════════════════
+       ADMIN MODALS
+       ══════════════════════════════════════ */
+    .admin-overlay{
+      position:fixed;inset:0;z-index:9500;
+      background:rgba(0,0,0,.45);
+      backdrop-filter:blur(4px);
+      display:flex;align-items:center;justify-content:center;
+      padding:16px;
+    }
+    .admin-modal{
+      background:var(--surface);
+      border-radius:var(--r-lg);
+      width:100%;max-width:400px;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+      overflow:hidden;
+      animation:ctxPop .18s ease-out;
+    }
+    .admin-modal-hdr{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 18px 14px;
+      border-bottom:1px solid var(--border);
+    }
+    .admin-modal-title{
+      font-size:15px;font-weight:700;color:var(--text-1);
+      display:flex;align-items:center;gap:9px;
+    }
+    .admin-modal-title svg{width:17px;height:17px;color:var(--accent)}
+    .admin-modal-close{
+      width:32px;height:32px;border-radius:8px;border:none;
+      background:var(--surface-2);color:var(--text-2);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+    }
+    .admin-modal-body{padding:18px}
+    .admin-field{margin-bottom:14px}
+    .admin-label{
+      display:block;font-size:12px;font-weight:600;
+      color:var(--text-2);margin-bottom:6px;
+    }
+    .admin-input{
+      width:100%;height:42px;padding:0 12px;
+      background:var(--surface-2);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-sm);
+      font-family:var(--font);font-size:14px;
+      color:var(--text-1);outline:none;
+      transition:border-color .18s,box-shadow .18s;
+    }
+    .admin-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-alpha)}
+    .admin-input.textarea{height:80px;padding:10px 12px;resize:none;}
+    .admin-footer{
+      padding:12px 18px 16px;
+      display:flex;gap:9px;justify-content:flex-end;
+      border-top:1px solid var(--border);
+    }
+    .admin-btn{
+      height:40px;padding:0 18px;
+      border-radius:var(--r-sm);border:none;
+      font-family:var(--font);font-size:13px;font-weight:700;
+      cursor:pointer;transition:opacity .15s;
+    }
+    .admin-btn.primary{background:var(--accent);color:#fff}
+    .admin-btn.primary:hover{opacity:.88}
+    .admin-btn.cancel{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-med)}
+    .admin-btn.cancel:hover{border-color:var(--text-2)}
+    .admin-btn.danger{background:var(--red);color:#fff}
+    .admin-btn.danger:hover{opacity:.88}
+
+    /* delete confirm box */
+    .del-confirm-box{
+      padding:18px;text-align:center;
+    }
+    .del-confirm-icon{
+      width:56px;height:56px;border-radius:50%;
+      background:var(--red-badge);
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 14px;
+    }
+    .del-confirm-icon svg{width:26px;height:26px;color:var(--red)}
+    .del-confirm-name{font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:6px}
+    .del-confirm-warn{font-size:13px;color:var(--text-2);line-height:1.6}
+
+    /* ══════════════════════════════════════
+       LONG PRESS VISUAL FEEDBACK
+       ══════════════════════════════════════ */
+    .s-card.pressing{
+      transform:scale(.97)!important;
+      border-color:var(--accent)!important;
+      box-shadow:0 0 0 3px var(--accent-alpha)!important;
+    }
+
+    /* ══════════════════════════════════════
+       NEW DASHBOARD CARDS
+       ══════════════════════════════════════ */
+    .dash-alert-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      background:var(--red-badge);color:var(--red-text);
+      font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:20px;
+    }
+    .dash-ok-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      background:var(--green-badge);color:var(--green-text);
+      font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:20px;
+    }
+    .risk-table{width:100%;border-collapse:collapse;font-size:13px}
+    .risk-table th{
+      padding:8px 10px;text-align:right;
+      font-size:11px;font-weight:600;color:var(--text-2);
+      border-bottom:2px solid var(--border-med);
+    }
+    .risk-table td{
+      padding:10px 10px;border-bottom:1px solid var(--border);
+      color:var(--text-1);font-weight:500;
+    }
+    .risk-table tr:last-child td{border-bottom:none}
+    .risk-table tr:hover td{background:var(--surface-2)}
+    .rate-bar-wrap{display:flex;align-items:center;gap:8px}
+    .rate-bar{
+      flex:1;height:6px;background:var(--border-med);
+      border-radius:3px;overflow:hidden;
+    }
+    .rate-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+    .rate-bar-fill.g{background:var(--green)}
+    .rate-bar-fill.r{background:var(--red)}
+    .rate-bar-fill.y{background:#f59e0b}
+    .streak-badge{
+      display:inline-block;
+      background:var(--red-badge);color:var(--red-text);
+      font-size:11px;font-weight:700;
+      padding:2px 9px;border-radius:20px;
+      white-space:nowrap;
+    }
+    .section-rank-num{
+      width:24px;height:24px;border-radius:50%;
+      background:var(--surface-2);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:700;color:var(--text-2);
+      margin-left:8px;flex-shrink:0;
+    }
+    .section-rank-num.gold{background:#fef3c7;color:#d97706}
+    .day-row{
+      display:flex;align-items:center;gap:10px;
+      padding:8px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .day-row:last-child{border-bottom:none}
+    .day-label{font-size:12px;font-weight:600;color:var(--text-2);min-width:40px;text-align:right}
+    .day-name{font-size:12px;color:var(--text-3);min-width:44px}
+    .day-rate-num{font-size:13px;font-weight:700;min-width:38px;text-align:left}
+    .dash-empty{
+      display:flex;flex-direction:column;align-items:center;
+      padding:32px 16px;gap:8px;color:var(--text-3);
+    }
+    .dash-empty svg{width:36px;height:36px;opacity:.4}
+    .dash-empty p{font-size:13px;font-weight:500}
+
+    /* ── RECORDING STATUS BANNER ── */
+    .rec-banner{
+      margin:0 22px 12px;
+      padding:12px 15px;
+      background:rgba(245,158,11,.08);
+      border:1px solid rgba(245,158,11,.28);
+      border-radius:var(--r-sm);
+      display:flex;align-items:center;gap:10px;
+      font-size:13px;font-weight:500;
+      color:#92400e;
+      animation:fadeIn .3s ease-out;
+    }
+    [data-theme="dark"] .rec-banner{
+      background:rgba(245,158,11,.1);
+      border-color:rgba(245,158,11,.22);
+      color:#fbbf24;
+    }
+    .rec-banner svg{width:16px;height:16px;flex-shrink:0}
+    @media(max-width:640px){.rec-banner{margin:0 14px 12px}}
+
+    /* ── DRAFT RESTORE BANNER ── */
+    .draft-banner{
+      margin:0 22px 12px;
+      padding:11px 14px;
+      background:rgba(59,130,246,.07);
+      border:1.5px solid rgba(59,130,246,.28);
+      border-radius:var(--r-sm);
+      display:flex;align-items:center;gap:11px;
+      animation:fadeIn .3s ease-out;
+    }
+    [data-theme="dark"] .draft-banner{
+      background:rgba(59,130,246,.1);
+      border-color:rgba(59,130,246,.25);
+    }
+    @media(max-width:640px){.draft-banner{margin:0 14px 12px;flex-wrap:wrap;gap:9px}}
+
+    .draft-banner-ico{
+      width:34px;height:34px;
+      border-radius:8px;
+      background:rgba(59,130,246,.12);
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;
+    }
+    .draft-banner-ico svg{width:17px;height:17px;color:#3b82f6}
+
+    .draft-banner-body{flex:1;min-width:0}
+    .draft-banner-title{
+      font-size:13px;font-weight:700;
+      color:#1d4ed8;margin-bottom:2px;
+    }
+    [data-theme="dark"] .draft-banner-title{color:#93c5fd}
+    .draft-banner-sub{
+      font-size:12px;color:#3b82f6;font-weight:500;
+    }
+    [data-theme="dark"] .draft-banner-sub{color:#60a5fa}
+
+    .draft-banner-actions{display:flex;gap:7px;flex-shrink:0}
+
+    .draft-restore-btn{
+      height:32px;padding:0 13px;
+      background:#3b82f6;color:#fff;
+      border:none;border-radius:7px;
+      font-family:var(--font);font-size:12px;font-weight:700;
+      cursor:pointer;white-space:nowrap;
+      transition:background .14s,transform .12s;
+    }
+    .draft-restore-btn:hover{background:#2563eb}
+    .draft-restore-btn:active{transform:scale(.96)}
+
+    .draft-discard-btn{
+      height:32px;padding:0 11px;
+      background:transparent;
+      border:1px solid rgba(59,130,246,.35);
+      border-radius:7px;
+      font-family:var(--font);font-size:12px;font-weight:600;
+      color:#3b82f6;cursor:pointer;white-space:nowrap;
+      transition:border-color .14s,background .14s;
+    }
+    .draft-discard-btn:hover{background:rgba(59,130,246,.08);border-color:#3b82f6}
+
+    /* pulse indicator on auto-save */
+    @keyframes draftSaved{
+      0%{opacity:1} 50%{opacity:.4} 100%{opacity:1}
+    }
+    .draft-indicator{
+      position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+      background:rgba(59,130,246,.9);color:#fff;
+      font-size:11px;font-weight:600;
+      padding:5px 14px;border-radius:20px;
+      pointer-events:none;
+      opacity:0;transition:opacity .3s;
+      white-space:nowrap;z-index:300;
+    }
+    .draft-indicator.show{opacity:1}
+
+    /* ══════════════════════════════════════
+       ONBOARDING GUIDE MODAL
+       ══════════════════════════════════════ */
+    .guide-overlay{
+      position:fixed;inset:0;z-index:999;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(4px);
+      display:flex;align-items:center;justify-content:center;
+      padding:16px;
+      opacity:0;
+      animation:guideIn .35s ease-out forwards;
+    }
+    @keyframes guideIn{to{opacity:1}}
+    .guide-overlay.closing{animation:guideOut .25s ease-in forwards}
+    @keyframes guideOut{to{opacity:0}}
+
+    .guide-modal{
+      background:var(--surface);
+      border-radius:var(--r-lg);
+      box-shadow:0 20px 60px rgba(0,0,0,.2);
+      max-width:480px;width:100%;
+      max-height:90vh;overflow-y:auto;
+      padding:28px 28px 24px;
+      position:relative;
+      transform:translateY(20px);
+      animation:modalUp .35s ease-out forwards;
+    }
+    @keyframes modalUp{to{transform:translateY(0)}}
+
+    .guide-badge{
+      display:inline-flex;align-items:center;gap:7px;
+      background:var(--accent-alpha);
+      color:var(--accent);
+      font-size:11px;font-weight:700;letter-spacing:.07em;
+      padding:4px 11px;border-radius:20px;
+      margin-bottom:14px;
+      text-transform:uppercase;
+    }
+    .guide-badge svg{width:11px;height:11px}
+
+    .guide-title{
+      font-size:20px;font-weight:700;
+      color:var(--text-1);margin-bottom:6px;
+    }
+    .guide-sub{
+      font-size:13px;color:var(--text-2);
+      margin-bottom:22px;line-height:1.6;
+    }
+
+    .guide-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+
+    .guide-step{
+      display:flex;gap:14px;
+      padding:14px 15px;
+      background:var(--surface-2);
+      border:1px solid var(--border);
+      border-radius:var(--r-md);
+      transition:border-color .18s;
+    }
+    .guide-step:hover{border-color:var(--accent)}
+
+    .guide-step-num{
+      width:32px;height:32px;
+      background:var(--accent);
+      color:#fff;
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;font-weight:700;
+      flex-shrink:0;margin-top:1px;
+    }
+
+    .guide-step-body{}
+    .guide-step-title{
+      font-size:14px;font-weight:700;
+      color:var(--text-1);margin-bottom:4px;
+    }
+    .guide-step-desc{
+      font-size:13px;color:var(--text-2);
+      line-height:1.55;
+    }
+    .guide-step-desc b{color:var(--text-1);font-weight:600}
+
+    .guide-tip{
+      display:flex;gap:10px;align-items:flex-start;
+      padding:12px 14px;
+      background:rgba(59,130,246,.07);
+      border:1px solid rgba(59,130,246,.18);
+      border-radius:var(--r-sm);
+      margin-bottom:22px;
+    }
+    .guide-tip svg{width:15px;height:15px;color:#3b82f6;flex-shrink:0;margin-top:1px}
+    .guide-tip p{font-size:12px;color:#3b82f6;font-weight:500;line-height:1.55}
+
+    .guide-close-btn{
+      width:100%;height:48px;
+      background:var(--accent);color:#fff;
+      border:none;border-radius:var(--r-md);
+      font-family:var(--font);font-size:15px;font-weight:700;
+      cursor:pointer;
+      box-shadow:0 4px 14px rgba(229,62,62,.3);
+      transition:background .14s,box-shadow .14s,transform .12s;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .guide-close-btn:hover{background:var(--accent-dark)}
+    .guide-close-btn:active{transform:scale(.98)}
+    .guide-close-btn svg{width:16px;height:16px}
+
+    /* Help button in header */
+    .help-btn{
+      width:40px;height:40px;
+      border-radius:var(--r-sm);
+      border:1px solid var(--border-med);
+      background:var(--surface-2);
+      color:var(--text-2);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;flex-shrink:0;
+      font-size:16px;font-weight:700;
+      transition:background .18s,color .18s,border-color .18s;
+    }
+    .help-btn:hover{background:var(--accent-alpha);border-color:var(--accent);color:var(--accent)}
+
+    /* ══════════════════════════════════════
+       CONNECTION INDICATOR
+       ══════════════════════════════════════ */
+    .conn-indicator{
+      display:flex;align-items:center;gap:6px;
+      height:40px;padding:0 11px;
+      border-radius:var(--r-sm);
+      border:1px solid var(--border-med);
+      background:var(--surface-2);
+      font-size:12px;font-weight:600;
+      cursor:pointer;
+      transition:all .18s;
+      white-space:nowrap;
+      flex-shrink:0;
+    }
+    .conn-indicator:hover{border-color:var(--accent);color:var(--accent)}
+    .conn-dot{
+      width:7px;height:7px;border-radius:50%;
+      flex-shrink:0;
+      transition:background .3s;
+    }
+    .conn-dot.connected{background:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.2)}
+    .conn-dot.disconnected{background:#e53e3e;box-shadow:0 0 0 2px rgba(229,62,62,.2)}
+    .conn-dot.embedded{background:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.2)}
+    .conn-label{color:var(--text-2)}
+    @media(max-width:640px){.conn-label{display:none}}
+
+    /* ══════════════════════════════════════
+       SETTINGS MODAL
+       ══════════════════════════════════════ */
+    .settings-overlay{
+      position:fixed;inset:0;z-index:998;
+      background:rgba(0,0,0,.5);
+      backdrop-filter:blur(4px);
+      display:flex;align-items:center;justify-content:center;
+      padding:16px;
+      opacity:0;
+      animation:guideIn .3s ease-out forwards;
+    }
+    .settings-overlay.closing{animation:guideOut .22s ease-in forwards}
+
+    .settings-modal{
+      background:var(--surface);
+      border-radius:var(--r-lg);
+      box-shadow:0 20px 60px rgba(0,0,0,.22);
+      max-width:460px;width:100%;
+      padding:26px 26px 22px;
+      transform:translateY(16px);
+      animation:modalUp .3s ease-out forwards;
+    }
+
+    .settings-header{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:20px;
+    }
+    .settings-title{
+      font-size:17px;font-weight:700;color:var(--text-1);
+      display:flex;align-items:center;gap:9px;
+    }
+    .settings-title svg{width:18px;color:var(--accent)}
+    .settings-close{
+      width:32px;height:32px;border:none;background:var(--surface-2);
+      border-radius:7px;cursor:pointer;color:var(--text-2);
+      display:flex;align-items:center;justify-content:center;
+      transition:background .14s,color .14s;
+    }
+    .settings-close:hover{background:var(--red-badge);color:var(--red)}
+    .settings-close svg{width:14px;height:14px}
+
+    .settings-section{
+      margin-bottom:18px;
+    }
+    .settings-lbl{
+      font-size:12px;font-weight:700;color:var(--text-2);
+      text-transform:uppercase;letter-spacing:.06em;
+      margin-bottom:7px;display:block;
+    }
+    .settings-input{
+      width:100%;height:44px;
+      background:var(--surface-2);
+      border:1.5px solid var(--border-med);
+      border-radius:var(--r-sm);
+      font-family:var(--font);font-size:13px;
+      color:var(--text-1);
+      padding:0 13px;outline:none;
+      transition:border-color .18s,box-shadow .18s;
+      direction:ltr;
+    }
+    .settings-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-alpha)}
+    .settings-input::placeholder{color:var(--text-3);direction:rtl}
+    .settings-hint{
+      font-size:11px;color:var(--text-3);margin-top:6px;line-height:1.5;
+    }
+    .settings-hint b{color:var(--text-2)}
+
+    .settings-status{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 13px;
+      border-radius:var(--r-sm);
+      font-size:12px;font-weight:600;
+      margin-bottom:16px;
+    }
+    .settings-status.ok{background:var(--green-badge);color:var(--green-text)}
+    .settings-status.er{background:var(--red-badge);color:var(--red-text)}
+    .settings-status.info{background:rgba(59,130,246,.1);color:#2563eb}
+    .settings-status svg{width:14px;height:14px;flex-shrink:0}
+
+    .settings-save-btn{
+      width:100%;height:46px;
+      background:var(--accent);color:#fff;
+      border:none;border-radius:var(--r-md);
+      font-family:var(--font);font-size:14px;font-weight:700;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      box-shadow:0 4px 14px rgba(229,62,62,.28);
+      transition:background .14s,transform .12s;
+    }
+    .settings-save-btn:hover{background:var(--accent-dark)}
+    .settings-save-btn:active{transform:scale(.98)}
+    .settings-save-btn svg{width:15px;height:15px}
+
+    .settings-divider{
+      height:1px;background:var(--border);margin:16px 0;
+    }
+    .settings-note{
+      font-size:11px;color:var(--text-3);line-height:1.6;text-align:center;
+    }
+
+    /* ══════════════════════════════════════
+       UNDO BUTTON
+       ══════════════════════════════════════ */
+    .undo-btn{
+      height:42px;padding:0 13px;
+      border-radius:var(--r-sm);
+      border:1px solid var(--border-med);
+      background:var(--surface);
+      color:var(--text-2);
+      font-family:var(--font);font-size:13px;font-weight:600;
+      cursor:pointer;
+      display:flex;align-items:center;gap:6px;
+      transition:all .18s;
+      white-space:nowrap;
+      animation:undoPop .25s cubic-bezier(.34,1.4,.64,1);
+    }
+    @keyframes undoPop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+    .undo-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-alpha)}
+    .undo-btn:active{transform:scale(.96)}
+    .undo-btn svg{width:14px;height:14px}
+    @media(max-width:520px){
+      .undo-btn .undo-lbl{display:none}
+      .undo-btn{padding:0 11px;width:42px;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       HEADER
+       ══════════════════════════════════════ -->
+  <header class="hdr">
+    <div class="hdr-row">
+      <!-- Logo -->
+      <div class="logo">
+        <div class="logo-mark">ج</div>
+        <span class="logo-name">جسور</span>
+      </div>
+
+      <!-- Controls (wrap on mobile) -->
+      <div class="hdr-right">
+
+        <!-- Dashboard toggle -->
+        <button id="toggleDashBtn" class="dash-btn" onclick="toggleDashboard()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-4 4 4 5-8"/></svg>
+          <span class="mob-hide">لوحة التحكم</span>
+        </button>
+
+        <!-- Section filter -->
+        <div class="sel-wrap" id="secFilterWrap">
+          <select id="sectionFilter" class="ctrl" onchange="filterAndRender()">
+            <option value="ALL">جميع الشعب</option>
+          </select>
+          <span class="sel-arrow">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+        </div>
+
+        <!-- Date picker with "today" badge -->
+        <div class="date-wrap" id="dateWrap">
+          <span class="today-badge">اليوم</span>
+          <input type="date" id="datePicker" class="ctrl" onchange="handleDateChange()">
+        </div>
+
+        <!-- Go to today shortcut -->
+        <button class="today-btn mob-hide" onclick="goToToday()" title="انتقل إلى اليوم">
+          اليوم ←
+        </button>
+
+        <!-- Theme toggle -->
+        <button class="theme-btn" onclick="toggleTheme()" title="تبديل الوضع">
+          <svg id="ico-moon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+          <svg id="ico-sun" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+
+        <!-- Connection status indicator -->
+        <button id="connIndicator" class="conn-indicator" onclick="openSettings()" title="إعدادات الاتصال">
+          <span class="conn-dot disconnected" id="connDot"></span>
+          <span class="conn-label" id="connLabel">الاتصال</span>
+        </button>
+
+        <!-- Help / Guide button -->
+        <button class="help-btn" onclick="openGuide()" title="دليل الاستخدام">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       SUMMARY STATS
+       ══════════════════════════════════════ -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-ico g">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div>
+        <div class="stat-num g" id="stat-p">0</div>
+        <div class="stat-lbl">حاضر</div>
+      </div>
+      <span class="pct g" id="pct-p">—</span>
+    </div>
+
+    <div class="stat">
+      <div class="stat-ico r">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <div>
+        <div class="stat-num r" id="stat-a">0</div>
+        <div class="stat-lbl">غائب</div>
+      </div>
+      <span class="pct r" id="pct-a">—</span>
+    </div>
+
+    <div class="stat mob-hide">
+      <div class="stat-ico b">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div>
+        <div class="stat-num" id="stat-total" style="color:var(--text-1)">0</div>
+        <div class="stat-lbl">إجمالي الطلاب</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading spinner -->
+  <div id="loading"><div class="spin"></div><span class="load-t">جاري تحميل البيانات…</span></div>
+
+  <!-- ══════════════════════════════════════
+       ATTENDANCE UI
+       ══════════════════════════════════════ -->
+  <div id="attendanceUI" class="gone">
+
+    <!-- بانر تحذيري: يظهر فقط حين لم يُحفظ حضور هذا اليوم بعد -->
+    <div id="recBanner" class="rec-banner gone">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>لم يُسجَّل حضور هذا اليوم بعد — حدِّد الغائبين ثم اضغط حفظ</span>
+    </div>
+
+    <!-- بانر استعادة المسودة: يظهر حين توجد بيانات غير محفوظة في الذاكرة المحلية -->
+    <div id="draftBanner" class="draft-banner gone">
+      <div class="draft-banner-ico">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M18.364 5.636a9 9 0 0 1 .203 12.539M15.536 8.464a5 5 0 0 1 .1 6.872M2 2l20 20M9.9 9.9a5 5 0 0 0 4.2 8.1M5.637 5.637a9 9 0 0 0 12.526 12.526"/>
+        </svg>
+      </div>
+      <div class="draft-banner-body">
+        <div class="draft-banner-title">⚡ يوجد مسودة غير محفوظة في هذا الجهاز</div>
+        <div class="draft-banner-sub">آخر تعديل تلقائي: الساعة <span id="draftTime">--:--</span> — هل تريد استعادة التعديلات؟</div>
+      </div>
+      <div class="draft-banner-actions">
+        <button class="draft-restore-btn" onclick="restoreDraft()">
+          ↩ استعادة
+        </button>
+        <button class="draft-discard-btn" onclick="discardDraft()">تجاهل</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <!-- Search -->
+      <div class="srch-wrap">
+        <span class="srch-ico">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </span>
+        <input class="srch" id="srch" type="text" placeholder="ابحث عن طالب…" oninput="filterAndRender()">
+      </div>
+
+      <!-- ✅ تحديد الكل / إلغاء تحديد الكل -->
+      <div class="qa-wrap">
+        <button class="qa-btn qa-g" onclick="setAllPresent()" title="تحديد الجميع حاضرين">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          <span class="qa-lbl">الكل حاضر</span>
+        </button>
+        <button class="qa-btn qa-r" onclick="setAllAbsent()" title="تحديد الجميع غائبين">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <span class="qa-lbl">الكل غائب</span>
+        </button>
+        <!-- زر التراجع -->
+        <button id="undoBtn" class="undo-btn gone" onclick="undoLast()" title="تراجع عن آخر عملية">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/></svg>
+          <span class="undo-lbl">تراجع</span>
+        </button>
+      </div>
+
+      <!-- Mobile tabs -->
+      <div class="tabs" id="tabs">
+        <button class="tab ag" id="tab-p" onclick="switchTab('present')">حضور (<span id="tp-n">0</span>)</button>
+        <button class="tab"    id="tab-a" onclick="switchTab('absent')">غياب (<span id="ta-n">0</span>)</button>
+      </div>
+    </div>
+
+    <!-- Two-column student lists -->
+    <div class="cols">
+      <div class="col" id="col-p">
+        <div class="col-hd">
+          <div class="col-title"><span class="dot g"></span>الحاضرون</div>
+          <span class="col-n g" id="pc-n">0</span>
+        </div>
+        <div class="s-list" id="presentList"></div>
+      </div>
+
+      <div class="col" id="col-a">
+        <div class="col-hd">
+          <div class="col-title"><span class="dot r"></span>الغائبون</div>
+          <div class="col-right">
+            <button class="rst-btn" onclick="setAllPresent()">تصفير</button>
+            <span class="col-n r" id="ac-n">0</span>
+          </div>
+        </div>
+        <div class="s-list" id="absentList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       DASHBOARD UI
+       ══════════════════════════════════════ -->
+  <div id="dashboardUI" class="gone">
+
+    <!-- Meta info bar -->
+    <div class="dash-meta" id="dashMeta">
+      <div class="dash-meta-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>الفترة: </span>
+        <span class="dash-meta-val" id="metaRange">—</span>
+      </div>
+      <div class="dash-meta-divider"></div>
+      <div class="dash-meta-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>إجمالي الطلاب: </span>
+        <span class="dash-meta-val" id="metaTotal">—</span>
+      </div>
+      <div class="dash-meta-divider"></div>
+      <div class="dash-meta-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span>أيام مسجلة: </span>
+        <span class="dash-meta-val" id="metaDays">—</span>
+      </div>
+      <div class="dash-meta-divider"></div>
+      <div class="dash-meta-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>متوسط الحضور: </span>
+        <span class="dash-meta-val" id="metaRate">—</span>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+
+      <!-- 🚨 تنبيهات الغياب المتكرر -->
+      <div class="dash-card">
+        <div class="dash-card-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <span>تنبيه: غياب 3 أيام متواصلة</span>
+          <span id="alertsBadge" style="margin-right:auto"></span>
+        </div>
+        <div id="alertsContainer"></div>
+      </div>
+
+      <!-- ⚠️ طلاب في خطر -->
+      <div class="dash-card">
+        <div class="dash-card-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span>طلاب تجاوزوا 25% غياب</span>
+          <span id="atRiskBadge" style="margin-right:auto"></span>
+        </div>
+        <div id="atRiskContainer"></div>
+      </div>
+
+      <!-- 📊 إحصاء الشعب -->
+      <div class="dash-card">
+        <div class="dash-card-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          ترتيب الشعب حسب الانضباط
+        </div>
+        <div id="sectionStatsContainer"></div>
+      </div>
+
+      <!-- 📅 آخر 7 أيام نشطة -->
+      <div class="dash-card">
+        <div class="dash-card-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          سجل آخر 7 أيام نشطة
+        </div>
+        <div id="recentDaysContainer"></div>
+      </div>
+
+      <!-- 🏅 الأكثر غياباً -->
+      <div class="dash-card">
+        <div class="dash-card-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          الطلاب الأكثر غياباً
+        </div>
+        <div id="topAbsentContainer"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Save bar -->
+  <div class="save-bar">
+    <div class="save-inner" id="saveInner">
+      <button class="save-btn" id="saveBtn" onclick="submitAttendance()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        حفظ ومزامنة السجل
+      </button>
+      <div id="statusMsg"></div>
+    </div>
+  </div>
+
+  <!-- مؤشر الحفظ التلقائي المحلي -->
+  <div id="draftIndicator" class="draft-indicator">💾 حُفظت مسودة محلية</div>
+
+  <!-- ══════════════════════════════════════
+       SETTINGS MODAL – إعدادات الاتصال
+       ══════════════════════════════════════ -->
+  <div id="settingsOverlay" class="settings-overlay gone" onclick="handleSettingsOverlayClick(event)">
+    <div class="settings-modal" id="settingsModal">
+
+      <div class="settings-header">
+        <div class="settings-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          إعدادات الاتصال بـ Apps Script
+        </div>
+        <button class="settings-close" onclick="closeSettings()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- حالة الاتصال الحالية -->
+      <div id="settingsStatus" class="settings-status info">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="settingsStatusText">جارٍ فحص بيئة التشغيل…</span>
+      </div>
+
+      <div class="settings-section">
+        <label class="settings-lbl" for="gasUrlInput">رابط Google Apps Script Web App</label>
+        <input
+          id="gasUrlInput"
+          class="settings-input"
+          type="url"
+          placeholder="https://script.google.com/macros/s/…/exec"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <div class="settings-hint">
+          الرابط الكامل لـ Web App بعد النشر من Apps Script.<br>
+          <b>الحصول عليه:</b> نشر → نشر جديد → تطبيق ويب → انسخ الرابط
+        </div>
+      </div>
+
+      <button class="settings-save-btn" onclick="saveGasUrl()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        حفظ الرابط وإعادة الاتصال
+      </button>
+
+      <div class="settings-divider"></div>
+      <div class="settings-note">
+        هذا الرابط يُحفظ في هذا الجهاز فقط ولا يُرسل لأي طرف ثالث.<br>
+        عند التشغيل داخل Apps Script مباشرةً لا حاجة لهذا الإعداد.
+      </div>
+
+    </div>
+  </div>
+       ══════════════════════════════════════ -->
+  <div id="guideOverlay" class="guide-overlay gone" onclick="handleOverlayClick(event)">
+    <div class="guide-modal" id="guideModal">
+
+      <div class="guide-badge">
+        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        دليل الاستخدام
+      </div>
+
+      <div class="guide-title">مرحباً بك في جسور 👋</div>
+      <div class="guide-sub">دليل سريع لتسجيل الحضور بشكل صحيح خلال دقيقة واحدة</div>
+
+      <div class="guide-steps">
+
+        <div class="guide-step">
+          <div class="guide-step-num">1</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">اختر التاريخ</div>
+            <div class="guide-step-desc">من حقل التاريخ في أعلى الصفحة اختر اليوم الذي تريد تسجيل حضوره. افتراضياً يكون <b>تاريخ اليوم</b> محدداً تلقائياً.</div>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">2</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">جميع الطلاب حاضرون افتراضياً</div>
+            <div class="guide-step-desc">عند فتح التطبيق ستجد كل الطلاب في عمود <b>الحاضرون</b>. مهمتك فقط <b>نقل الغائبين</b> إلى العمود الآخر.</div>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">3</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">انقر على الطالب لنقله</div>
+            <div class="guide-step-desc">اضغط على بطاقة أي طالب لنقله: من <b style="color:var(--green-text)">الحاضرين → الغائبين</b>، أو العكس. يمكنك أيضاً استخدام زرَّي <b>الكل حاضر / الكل غائب</b> للتسريع.</div>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">4</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">اضغط "حفظ ومزامنة السجل"</div>
+            <div class="guide-step-desc">بعد الانتهاء من التعديلات سيظهر زر الحفظ في أسفل الشاشة. اضغطه <b>لحفظ البيانات في السحابة</b> بشكل دائم.</div>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">5</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">زر التراجع لإصلاح الأخطاء</div>
+            <div class="guide-step-desc">إذا أخطأت في نقل طالب، اضغط زر <b>تراجع</b> (↩) في شريط الأدوات للعودة إلى الحالة السابقة قبل الحفظ.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="guide-tip">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>يمكنك إعادة فتح هذا الدليل في أي وقت بالضغط على أيقونة <b>؟</b> في أعلى يسار الشاشة.</p>
+      </div>
+
+      <button class="guide-close-btn" onclick="closeGuide()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        فهمت، لنبدأ!
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       CONTEXT MENU – قائمة الإجراءات الإدارية
+       ══════════════════════════════════════ -->
+  <div id="ctxBackdrop" class="ctx-backdrop gone" onclick="closeCtxMenu()"></div>
+  <div id="ctxMenu" class="ctx-menu gone">
+    <div class="ctx-header">
+      <div class="ctx-name" id="ctxStudentName">—</div>
+      <div class="ctx-sec" id="ctxStudentSec">—</div>
+    </div>
+    <div class="ctx-item" onclick="openEditModal()">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      تعديل بيانات الطالب
+    </div>
+    <div class="ctx-item" onclick="openTransferModal()">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+      نقل إلى شعبة أخرى
+    </div>
+    <div class="ctx-item danger" onclick="openDeleteModal()">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      حذف الطالب نهائياً
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       EDIT MODAL
+       ══════════════════════════════════════ -->
+  <div id="editOverlay" class="admin-overlay gone" onclick="if(event.target===this)closeEditModal()">
+    <div class="admin-modal">
+      <div class="admin-modal-hdr">
+        <div class="admin-modal-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          تعديل بيانات الطالب
+        </div>
+        <button class="admin-modal-close" onclick="closeEditModal()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="admin-field">
+          <label class="admin-label">الاسم الكامل</label>
+          <input id="editName" class="admin-input" type="text" placeholder="اسم الطالب">
+        </div>
+        <div class="admin-field">
+          <label class="admin-label">الشعبة</label>
+          <input id="editSection" class="admin-input" type="text" placeholder="رمز الشعبة">
+        </div>
+        <div class="admin-field">
+          <label class="admin-label">ملاحظات إدارية</label>
+          <textarea id="editNotes" class="admin-input textarea" placeholder="أي ملاحظات تخص الطالب…"></textarea>
+        </div>
+      </div>
+      <div class="admin-footer">
+        <button class="admin-btn cancel" onclick="closeEditModal()">إلغاء</button>
+        <button class="admin-btn primary" onclick="saveEditStudent()">حفظ التعديلات</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TRANSFER MODAL
+       ══════════════════════════════════════ -->
+  <div id="transferOverlay" class="admin-overlay gone" onclick="if(event.target===this)closeTransferModal()">
+    <div class="admin-modal">
+      <div class="admin-modal-hdr">
+        <div class="admin-modal-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+          نقل إلى شعبة أخرى
+        </div>
+        <button class="admin-modal-close" onclick="closeTransferModal()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:14px">
+          نقل الطالب <strong id="transferStudentName"></strong> إلى:
+        </p>
+        <div class="admin-field">
+          <label class="admin-label">الشعبة الجديدة</label>
+          <select id="transferSection" class="admin-input" style="cursor:pointer"></select>
+        </div>
+      </div>
+      <div class="admin-footer">
+        <button class="admin-btn cancel" onclick="closeTransferModal()">إلغاء</button>
+        <button class="admin-btn primary" onclick="saveTransferStudent()">تأكيد النقل</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       DELETE CONFIRM MODAL
+       ══════════════════════════════════════ -->
+  <div id="deleteOverlay" class="admin-overlay gone" onclick="if(event.target===this)closeDeleteModal()">
+    <div class="admin-modal">
+      <div class="admin-modal-hdr">
+        <div class="admin-modal-title" style="color:var(--red)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>
+          حذف الطالب
+        </div>
+        <button class="admin-modal-close" onclick="closeDeleteModal()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="del-confirm-box">
+        <div class="del-confirm-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>
+        </div>
+        <div class="del-confirm-name" id="deleteStudentName"></div>
+        <div class="del-confirm-warn">
+          سيتم حذف سجل الطالب نهائياً من جميع أوراق العمل<br>
+          وإعادة ترقيم الـ IDs تلقائياً.<br>
+          <strong>هذا الإجراء لا يمكن التراجع عنه.</strong>
+        </div>
+      </div>
+      <div class="admin-footer">
+        <button class="admin-btn cancel" onclick="closeDeleteModal()">إلغاء</button>
+        <button class="admin-btn danger" onclick="confirmDeleteStudent()">نعم، احذف نهائياً</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  /* ════════════════════════════════════════════════════════════════
+     GAS BRIDGE – طبقة الاتصال الموحّدة
+     تعمل تلقائياً داخل Apps Script أو عبر fetch من GitHub Pages
+     ════════════════════════════════════════════════════════════════ */
+
+  // ══════════════════════════════════════════════════════════════
+  // ★★★  ضع رابط نشر Apps Script هنا  ★★★
+  // ══════════════════════════════════════════════════════════════
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbyLZHFVW7S4NFcPJW9hweRZ0BMCUjiigBhCVce1nmhr2ZHDf5ZtM0E2vx5UEVxARLxg/exec';
+
+  // تحديث localStorage دائماً بالرابط المضمّن
+  try { localStorage.setItem('jasoor_gas_url', GAS_URL); } catch(e){}
+
+  /**
+   * gasCall(fnName, ...args) → Promise
+   */
+  function gasCall(fnName, ...args){
+    return new Promise((resolve, reject) => {
+      if(typeof google !== 'undefined' && google.script && google.script.run){
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(e => reject(e))
+          [fnName](...args);
+        return;
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => {
+        controller.abort();
+        reject(new Error('انتهت مهلة الاتصال – تحقق من رابط النشر وصلاحيات Apps Script'));
+      }, 30000);
+      fetch(GAS_URL, {
+        method : 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body   : JSON.stringify({ action: fnName, args }),
+        signal : controller.signal
+      })
+      .then(r => {
+        clearTimeout(timer);
+        if(!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(res => {
+        if(res.ok) resolve(res.data);
+        else reject(new Error(res.error || 'خطأ من الخادم'));
+      })
+      .catch(err => { clearTimeout(timer); reject(err); });
+    });
+  }
+
+  /* ════════════════════════════════════
+     STATE
+     ════════════════════════════════════ */
+  let all=[], present=[], absent=[], origMap={}, activeTab='present', viewMode='attendance';
+  let charts = {};
+
+  /* ════════════════════════════════════
+     THEME
+     ════════════════════════════════════ */
+  function applyTheme(dark){
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.getElementById('ico-moon').style.display = dark ? 'none' : '';
+    document.getElementById('ico-sun').style.display  = dark ? '' : 'none';
+    if(charts.trend) updateChartsTheme();
+  }
+  function toggleTheme(){
+    const d = document.documentElement.getAttribute('data-theme') === 'dark';
+    localStorage.setItem('theme', d ? 'light' : 'dark');
+    applyTheme(!d);
+  }
+  (()=>{
+    const s = localStorage.getItem('theme');
+    applyTheme(s ? s==='dark' : window.matchMedia('(prefers-color-scheme:dark)').matches);
+  })();
+
+  /* ════════════════════════════════════
+     DATE HELPERS – smart "today" detection
+     ════════════════════════════════════ */
+  function getTodayStr(){
+    // Use local date string (YYYY-MM-DD) to match input[type=date] value
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function updateTodayIndicator(){
+    const today  = getTodayStr();
+    const picked = document.getElementById('datePicker').value;
+    const wrap   = document.getElementById('dateWrap');
+    if(picked === today){
+      wrap.classList.add('is-today');
+    } else {
+      wrap.classList.remove('is-today');
+    }
+  }
+
+  function goToToday(){
+    document.getElementById('datePicker').value = getTodayStr();
+    handleDateChange();
+  }
+
+  /* ════════════════════════════════════
+     INIT
+     ════════════════════════════════════ */
+  window.onload = () => {
+    const today = getTodayStr();
+    document.getElementById('datePicker').value = today;
+    updateTodayIndicator();
+
+    gasCall('getInitialData')
+      .then(data => {
+        all = data.students;
+        document.getElementById('stat-total').textContent = all.length;
+        origMap = data.initialAttendance || {};
+        populateSections(data.sections);
+        applyMap(origMap);
+        // ← إظهار البانر إذا اليوم لم يُسجَّل بعد
+        showRecordingBanner(!data.isTodayRecorded);
+        document.getElementById('loading').classList.add('gone');
+        document.getElementById('attendanceUI').classList.remove('gone');
+      })
+      .catch(e => showMsg(e.message, false));
+  };
+
+  function populateSections(secs){
+    const sel = document.getElementById('sectionFilter');
+    secs.forEach(s => {
+      if(!s) return;
+      const o = document.createElement('option');
+      o.value = s; o.textContent = 'شعبة ' + s;
+      sel.appendChild(o);
+    });
+  }
+
+  function applyMap(map){
+    present = []; absent = [];
+    all.forEach(s => (map[s.id] === false ? absent : present).push(s));
+    filterAndRender();
+  }
+
+  function handleDateChange(){
+    updateTodayIndicator();
+    if(viewMode === 'dashboard'){
+      loadDashboard();
+    } else {
+      loadAttendanceForDate();
+    }
+  }
+
+  function loadAttendanceForDate(){
+    const d = document.getElementById('datePicker').value;
+    document.getElementById('attendanceUI').classList.add('dim');
+    gasCall('getAttendanceForDate', d)
+      .then(result => {
+        // result = { attendance: {…}, isRecorded: bool }
+        origMap = result.attendance;
+        applyMap(result.attendance);
+        showRecordingBanner(!result.isRecorded); // ← بانر تحذيري للأيام غير المسجَّلة
+        document.getElementById('attendanceUI').classList.remove('dim');
+      })
+      .catch(e => {
+        showMsg(e.message, false);
+        document.getElementById('attendanceUI').classList.remove('dim');
+      });
+  }
+
+  /* إظهار/إخفاء بانر "لم يُسجَّل هذا اليوم بعد" */
+  function showRecordingBanner(show){
+    document.getElementById('recBanner').classList.toggle('gone', !show);
+  }
+
+  /* ════════════════════════════════════
+     QUICK-ACTION: تحديد الكل / إلغاء تحديد الكل
+     ════════════════════════════════════ */
+  function setAllPresent(){
+    // تصفير – جميع الطلاب حاضرون
+    const sec = document.getElementById('sectionFilter').value;
+    if(sec === 'ALL'){
+      present = [...all]; absent = [];
+    } else {
+      // only affect current section filter
+      const moved = absent.filter(s => s.section === sec);
+      moved.forEach(s => {
+        absent.splice(absent.indexOf(s), 1);
+        present.unshift(s);
+      });
+    }
+    filterAndRender();
+  }
+
+  function setAllAbsent(){
+    // جميع الطلاب غائبون (مع مراعاة الفلتر)
+    const sec = document.getElementById('sectionFilter').value;
+    if(sec === 'ALL'){
+      absent = [...all]; present = [];
+    } else {
+      const moved = present.filter(s => s.section === sec);
+      moved.forEach(s => {
+        present.splice(present.indexOf(s), 1);
+        absent.unshift(s);
+      });
+    }
+    filterAndRender();
+  }
+
+  /* ════════════════════════════════════
+     DASHBOARD – يستدعي الـ backend الحقيقي
+     ════════════════════════════════════ */
+  function toggleDashboard(){
+    const btn = document.getElementById('toggleDashBtn');
+    if(viewMode === 'attendance'){
+      viewMode = 'dashboard';
+      btn.classList.add('active');
+      btn.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span class="mob-hide">تسجيل الحضور</span>`;
+      document.getElementById('attendanceUI').classList.add('gone');
+      document.getElementById('secFilterWrap').classList.add('gone');
+      document.getElementById('dashboardUI').classList.remove('gone');
+      document.getElementById('saveInner').classList.remove('vis');
+      loadDashboard();
+    } else {
+      viewMode = 'attendance';
+      btn.classList.remove('active');
+      btn.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-4 4 4 5-8"/></svg><span class="mob-hide">لوحة التحكم</span>`;
+      document.getElementById('dashboardUI').classList.add('gone');
+      document.getElementById('secFilterWrap').classList.remove('gone');
+      document.getElementById('attendanceUI').classList.remove('gone');
+      filterAndRender();
+    }
+  }
+
+  function loadDashboard(){
+    const dash = document.getElementById('dashboardUI');
+    dash.classList.add('dim');
+    gasCall('getDashboardData')
+      .then(data => {
+        renderDashboard(data);
+        dash.classList.remove('dim');
+      })
+      .catch(e => {
+        showMsg('خطأ في تحميل لوحة التحكم: ' + e.message, false);
+        dash.classList.remove('dim');
+      });
+  }
+
+  /* ── تحديث شريط المعلومات في الداشبورد ── */
+  function renderDashboardMeta(meta){
+    if(!meta) return;
+    document.getElementById('metaRange').textContent =
+      meta.noData ? 'لا توجد بيانات بعد' : (meta.startDate + ' → ' + meta.endDate);
+    document.getElementById('metaDays').textContent  = meta.activeDays > 0 ? meta.activeDays + ' يوم' : '—';
+    document.getElementById('metaRate').textContent  = meta.overallRate > 0 ? meta.overallRate + '%' : '—';
+    const tot = document.getElementById('metaTotal');
+    if(tot) tot.textContent = (meta.totalStudents || 0) + ' طالب';
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     NEW DASHBOARD RENDERING – بدون مخططات، فقط بيانات قابلة للعمل
+     ════════════════════════════════════════════════════════════════ */
+  function renderDashboard(data){
+    renderDashboardMeta(data.meta);
+    if(data.meta && data.meta.noData){
+      ['alertsContainer','atRiskContainer','sectionStatsContainer','recentDaysContainer','topAbsentContainer']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.innerHTML = `<div class="dash-empty">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <p>لا توجد بيانات بعد</p></div>`;
+        });
+      return;
+    }
+
+    // ── 1. تنبيهات الغياب المتكرر ──
+    const alertsEl = document.getElementById('alertsContainer');
+    const badge1   = document.getElementById('alertsBadge');
+    if(data.alerts && data.alerts.length > 0){
+      badge1.innerHTML = `<span class="dash-alert-badge">⚠️ ${data.alerts.length}</span>`;
+      alertsEl.innerHTML = `<table class="risk-table">
+        <thead><tr><th>الاسم</th><th>الشعبة</th><th>أيام متتالية</th></tr></thead>
+        <tbody>${data.alerts.map(s=>`
+          <tr>
+            <td><strong>${s.name}</strong></td>
+            <td>شعبة ${s.section}</td>
+            <td><span class="streak-badge">🔴 ${s.streak} أيام</span></td>
+          </tr>`).join('')}</tbody>
+      </table>`;
+    } else {
+      badge1.innerHTML = `<span class="dash-ok-badge">✓ لا تنبيهات</span>`;
+      alertsEl.innerHTML = `<div class="dash-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <p>🎉 لا يوجد غياب متكرر حالياً</p></div>`;
+    }
+
+    // ── 2. طلاب في خطر ──
+    const riskEl = document.getElementById('atRiskContainer');
+    const badge2 = document.getElementById('atRiskBadge');
+    if(data.atRisk && data.atRisk.length > 0){
+      badge2.innerHTML = `<span class="dash-alert-badge">${data.atRisk.length} طالب</span>`;
+      riskEl.innerHTML = `<table class="risk-table">
+        <thead><tr><th>الاسم</th><th>الشعبة</th><th>نسبة الغياب</th><th>أيام</th></tr></thead>
+        <tbody>${data.atRisk.map(s=>{
+          const cls = s.rate>=50?'r':s.rate>=35?'y':'r';
+          return `<tr>
+            <td><strong>${s.name}</strong></td>
+            <td>شعبة ${s.section}</td>
+            <td>
+              <div class="rate-bar-wrap">
+                <div class="rate-bar"><div class="rate-bar-fill ${cls}" style="width:${s.rate}%"></div></div>
+                <span style="font-size:12px;font-weight:700;color:var(--red)">${s.rate}%</span>
+              </div>
+            </td>
+            <td><span class="streak-badge">${s.absCount}</span></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+    } else {
+      badge2.innerHTML = `<span class="dash-ok-badge">✓ جميعهم بخير</span>`;
+      riskEl.innerHTML = `<div class="dash-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <p>لا يوجد طلاب تجاوزوا حد الغياب 🎉</p></div>`;
+    }
+
+    // ── 3. إحصاء الشعب ──
+    const secEl = document.getElementById('sectionStatsContainer');
+    if(data.sectionStats && data.sectionStats.length > 0){
+      secEl.innerHTML = `<table class="risk-table">
+        <thead><tr><th>#</th><th>الشعبة</th><th>عدد الطلاب</th><th>نسبة الحضور</th></tr></thead>
+        <tbody>${data.sectionStats.map((s,i)=>{
+          const cls = s.presRate>=85?'g':s.presRate>=70?'y':'r';
+          const numCls = i===0?'gold':'';
+          return `<tr>
+            <td><span class="section-rank-num ${numCls}">${i+1}</span></td>
+            <td><strong>شعبة ${s.name}</strong></td>
+            <td style="text-align:center">${s.total}</td>
+            <td>
+              <div class="rate-bar-wrap">
+                <div class="rate-bar"><div class="rate-bar-fill ${cls}" style="width:${s.presRate}%"></div></div>
+                <span style="font-size:12px;font-weight:700">${s.presRate}%</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+    } else {
+      secEl.innerHTML = `<div class="dash-empty"><p>لا توجد بيانات</p></div>`;
+    }
+
+    // ── 4. آخر 7 أيام ──
+    const daysEl  = document.getElementById('recentDaysContainer');
+    const dayNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    if(data.recentDays && data.recentDays.length > 0){
+      daysEl.innerHTML = data.recentDays.slice().reverse().map(d=>{
+        const cls = d.rate>=85?'g':d.rate>=70?'y':'r';
+        return `<div class="day-row">
+          <span class="day-label">${d.label}</span>
+          <span class="day-name">${dayNames[d.dayOfWeek]||''}</span>
+          <div class="rate-bar" style="flex:1"><div class="rate-bar-fill ${cls}" style="width:${d.rate}%"></div></div>
+          <span class="day-rate-num" style="color:${d.rate>=85?'var(--green)':d.rate>=70?'#f59e0b':'var(--red)'}">${d.rate}%</span>
+        </div>`;
+      }).join('');
+    } else {
+      daysEl.innerHTML = `<div class="dash-empty"><p>لا توجد بيانات</p></div>`;
+    }
+
+    // ── 5. الأكثر غياباً ──
+    const topEl = document.getElementById('topAbsentContainer');
+    if(data.topAbsent && data.topAbsent.length > 0){
+      topEl.innerHTML = `<table class="risk-table">
+        <thead><tr><th>#</th><th>الاسم</th><th>الشعبة</th><th>أيام غياب</th></tr></thead>
+        <tbody>${data.topAbsent.map((s,i)=>`
+          <tr>
+            <td><span class="section-rank-num ${i===0?'gold':''}">${i+1}</span></td>
+            <td><strong>${s.name}</strong></td>
+            <td>شعبة ${s.section}</td>
+            <td><span class="streak-badge">${s.count} يوم</span></td>
+          </tr>`).join('')}</tbody>
+      </table>`;
+    } else {
+      topEl.innerHTML = `<div class="dash-empty"><p>🎉 لا يوجد غياب مسجل</p></div>`;
+    }
+  }
+
+  function updateChartsTheme(){} // لم نعد نستخدم مخططات
+
+  /* ════════════════════════════════════════════════════════════════
+     LONG PRESS + CONTEXT MENU
+     ════════════════════════════════════════════════════════════════ */
+  let _lpTimer = null;
+  let _lpActive = false;
+  let _ctxStudent = null; // { id, name, section }
+
+  function startLongPress(e, id, name, section){
+    _lpActive = false;
+    clearTimeout(_lpTimer);
+    const card = e.currentTarget;
+    _lpTimer = setTimeout(() => {
+      _lpActive = true;
+      card.classList.add('pressing');
+      setTimeout(()=>card.classList.remove('pressing'), 400);
+      _ctxStudent = { id, name, section };
+      showCtxMenu(e, name, section);
+    }, 700);
+  }
+
+  function cancelLongPress(){
+    clearTimeout(_lpTimer);
+    _lpTimer = null;
+  }
+
+  function handleCardClick(e, id, from){
+    if(_lpActive){ _lpActive = false; return; }
+    move(id, from);
+  }
+
+  function showCtxMenu(e, name, section){
+    document.getElementById('ctxStudentName').textContent = name;
+    document.getElementById('ctxStudentSec').textContent  = 'شعبة ' + section;
+    const menu = document.getElementById('ctxMenu');
+    const backdrop = document.getElementById('ctxBackdrop');
+    menu.classList.remove('gone');
+    backdrop.classList.remove('gone');
+    // تحديد الموضع
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) || 100;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) || 100;
+    const mw = 210, mh = 160;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    menu.style.left = Math.min(x, vw - mw - 10) + 'px';
+    menu.style.top  = Math.min(y, vh - mh - 10) + 'px';
+    menu.style.right = 'auto';
+  }
+
+  function closeCtxMenu(){
+    document.getElementById('ctxMenu').classList.add('gone');
+    document.getElementById('ctxBackdrop').classList.add('gone');
+    _ctxStudent = null;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     EDIT MODAL
+     ════════════════════════════════════════════════════════════════ */
+  function openEditModal(){
+    if(!_ctxStudent) return;
+    closeCtxMenu();
+    const s = all.find(x => x.id === _ctxStudent.id) || _ctxStudent;
+    document.getElementById('editName').value    = s.name    || '';
+    document.getElementById('editSection').value = s.section || '';
+    document.getElementById('editNotes').value   = s.notes   || '';
+    document.getElementById('editOverlay').classList.remove('gone');
+  }
+
+  function closeEditModal(){
+    document.getElementById('editOverlay').classList.add('gone');
+  }
+
+  function saveEditStudent(){
+    if(!_ctxStudent) return;
+    const name    = document.getElementById('editName').value.trim();
+    const section = document.getElementById('editSection').value.trim();
+    const notes   = document.getElementById('editNotes').value.trim();
+    if(!name){ alert('الاسم لا يمكن أن يكون فارغاً'); return; }
+    closeEditModal();
+    showMsg('جاري حفظ التعديلات…', true);
+    gasCall('editStudent', { id: _ctxStudent.id, name, section, notes })
+      .then(msg => {
+        // تحديث الـ state المحلي
+        const s = all.find(x => x.id === _ctxStudent.id);
+        if(s){ s.name = name; s.section = section; s.notes = notes; }
+        [present, absent].forEach(arr => {
+          const ss = arr.find(x => x.id === _ctxStudent.id);
+          if(ss){ ss.name = name; ss.section = section; }
+        });
+        filterAndRender();
+        showMsg(msg || 'تم تحديث البيانات ✓', true);
+        _ctxStudent = null;
+      })
+      .catch(e => showMsg('خطأ: ' + e.message, false));
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     TRANSFER MODAL
+     ════════════════════════════════════════════════════════════════ */
+  function openTransferModal(){
+    if(!_ctxStudent) return;
+    closeCtxMenu();
+    document.getElementById('transferStudentName').textContent = _ctxStudent.name;
+    // ملء قائمة الشعب
+    const sel = document.getElementById('transferSection');
+    sel.innerHTML = '';
+    const allSections = [...new Set(all.map(s=>s.section))].sort();
+    allSections.filter(sec => sec !== _ctxStudent.section).forEach(sec => {
+      const o = document.createElement('option');
+      o.value = sec; o.textContent = 'شعبة ' + sec;
+      sel.appendChild(o);
+    });
+    document.getElementById('transferOverlay').classList.remove('gone');
+  }
+
+  function closeTransferModal(){
+    document.getElementById('transferOverlay').classList.add('gone');
+  }
+
+  function saveTransferStudent(){
+    if(!_ctxStudent) return;
+    const newSection = document.getElementById('transferSection').value;
+    if(!newSection) return;
+    closeTransferModal();
+    showMsg('جاري نقل الطالب…', true);
+    gasCall('transferStudent', _ctxStudent.id, newSection)
+      .then(msg => {
+        const s = all.find(x => x.id === _ctxStudent.id);
+        if(s) s.section = newSection;
+        [present, absent].forEach(arr => {
+          const ss = arr.find(x => x.id === _ctxStudent.id);
+          if(ss) ss.section = newSection;
+        });
+        filterAndRender();
+        showMsg(msg || 'تم نقل الطالب ✓', true);
+        _ctxStudent = null;
+      })
+      .catch(e => showMsg('خطأ: ' + e.message, false));
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     DELETE MODAL
+     ════════════════════════════════════════════════════════════════ */
+  function openDeleteModal(){
+    if(!_ctxStudent) return;
+    closeCtxMenu();
+    document.getElementById('deleteStudentName').textContent = _ctxStudent.name;
+    document.getElementById('deleteOverlay').classList.remove('gone');
+  }
+
+  function closeDeleteModal(){
+    document.getElementById('deleteOverlay').classList.add('gone');
+  }
+
+  function confirmDeleteStudent(){
+    if(!_ctxStudent) return;
+    const id = _ctxStudent.id;
+    closeDeleteModal();
+    showMsg('جاري الحذف وإعادة الفهرسة…', true);
+    gasCall('deleteStudent', id)
+      .then(msg => {
+        all    = all.filter(s => s.id !== id);
+        present = present.filter(s => s.id !== id);
+        absent  = absent.filter(s => s.id !== id);
+        document.getElementById('stat-total').textContent = all.length;
+        filterAndRender();
+        showMsg(msg || 'تم الحذف وإعادة الترقيم ✓', true);
+        _ctxStudent = null;
+      })
+      .catch(e => showMsg('خطأ: ' + e.message, false));
+  }
+
+  /* ════════════════════════════════════
+     LIST UI
+     ════════════════════════════════════ */
+  function switchTab(tab){
+    activeTab = tab;
+    document.getElementById('tab-p').className = 'tab '+(tab==='present'?'ag':'');
+    document.getElementById('tab-a').className = 'tab '+(tab==='absent'?'ar':'');
+    filterAndRender();
+  }
+
+  function filterAndRender(){
+    if(viewMode === 'dashboard') return;
+
+    const sec = document.getElementById('sectionFilter').value;
+    const q   = (document.getElementById('srch').value || '').trim();
+    const mob = window.innerWidth < 768;
+
+    const match = s =>
+      (sec==='ALL' || s.section===sec) && (!q || s.name.includes(q));
+
+    const fP = present.filter(match);
+    const fA = absent.filter(match);
+    const tot = fP.length + fA.length || 1;
+
+    const set = (id, v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+    set('pc-n', fP.length); set('ac-n', fA.length);
+    set('tp-n', fP.length); set('ta-n', fA.length);
+    set('stat-p', fP.length); set('stat-a', fA.length);
+    set('pct-p', Math.round(fP.length/tot*100)+'%');
+    set('pct-a', Math.round(fA.length/tot*100)+'%');
+
+    const cp = document.getElementById('col-p');
+    const ca = document.getElementById('col-a');
+    if(mob){
+      cp.classList.toggle('gone', activeTab!=='present');
+      ca.classList.toggle('gone', activeTab!=='absent');
+    } else {
+      cp.classList.remove('gone');
+      ca.classList.remove('gone');
+    }
+
+    render('presentList', fP, 'g', 'present');
+    render('absentList',  fA, 'r', 'absent');
+    checkChanges();
+  }
+
+  function ini(name){
+    const p = name.trim().split(' ');
+    return p.length>=2 ? p[0][0]+p[1][0] : p[0].substring(0,2);
+  }
+
+  function render(id, list, color, from){
+    const el = document.getElementById(id);
+    if(!list.length){
+      el.innerHTML = `<div class="empty">
+        <div class="empty-ico"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="empty-t">لا توجد نتائج</div>
+        <div class="empty-s">عدّل الفلتر أو البحث</div>
+      </div>`;
+      return;
+    }
+    const arr = color==='g'
+      ? `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`
+      : `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>`;
+
+    el.innerHTML = list.map((s, i) => `
+      <div class="s-card h${color}" style="animation-delay:${Math.min(i*.022,.28)}s"
+           data-id="${s.id}" data-name="${s.name.replace(/"/g,'&quot;')}" data-section="${s.section}"
+           onclick="handleCardClick(event,'${s.id}','${from}')"
+           onmousedown="startLongPress(event,'${s.id}','${s.name}','${s.section}')"
+           onmouseup="cancelLongPress()" onmouseleave="cancelLongPress()"
+           ontouchstart="startLongPress(event,'${s.id}','${s.name}','${s.section}')"
+           ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
+        <div class="av ${color}">${ini(s.name)}</div>
+        <div class="card-body">
+          <div class="card-name">${s.name}</div>
+          <div class="card-sec">شعبة ${s.section}</div>
+        </div>
+        <div class="card-act ${color}">${arr}</div>
+      </div>`).join('');
+  }
+
+  function move(id, from){
+    if(from==='present'){
+      const i = present.findIndex(s=>s.id===id);
+      if(i!==-1) absent.unshift(present.splice(i,1)[0]);
+    } else {
+      const i = absent.findIndex(s=>s.id===id);
+      if(i!==-1) present.unshift(absent.splice(i,1)[0]);
+    }
+    filterAndRender();
+  }
+
+  function checkChanges(){
+    if(viewMode==='dashboard') return;
+    let ch = false;
+    absent.forEach(s  => { if(origMap[s.id] !== false) ch=true; });
+    present.forEach(s => { if(origMap[s.id] === false) ch=true; });
+    document.getElementById('saveInner').classList.toggle('vis', ch);
+  }
+
+  /* ════════════════════════════════════
+     SAVE
+     ════════════════════════════════════ */
+  function submitAttendance(){
+    const btn  = document.getElementById('saveBtn');
+    const date = document.getElementById('datePicker').value;
+    btn.disabled = true;
+    btn.innerHTML = `<div class="spin" style="width:18px;height:18px;border-width:2px;border-color:rgba(255,255,255,.2);border-top-color:#fff"></div>`;
+
+    const attendance = {};
+    all.forEach(s    => { attendance[s.id] = true;  });
+    absent.forEach(s => { attendance[s.id] = false; });
+
+    const reset = () => {
+      btn.disabled = false;
+      btn.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> حفظ ومزامنة السجل`;
+    };
+
+    gasCall('saveAttendance', { date, attendance })
+      .then(msg => {
+        origMap = {...attendance};
+        checkChanges();
+        showMsg(msg || 'تم الحفظ بنجاح ✓', true);
+        reset();
+      })
+      .catch(e => { showMsg(e.message, false); reset(); });
+  }
+
+  function showMsg(msg, ok){
+    const el = document.getElementById('statusMsg');
+    el.textContent = msg; el.className = ok ? 'ok' : 'er';
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display='none'; }, 4000);
+  }
+
+  window.addEventListener('resize', filterAndRender);
+
+  /* ════════════════════════════════════
+     ONBOARDING GUIDE
+     ════════════════════════════════════ */
+  function openGuide(){
+    const el = document.getElementById('guideOverlay');
+    el.classList.remove('gone');
+    el.classList.remove('closing');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGuide(){
+    const el = document.getElementById('guideOverlay');
+    el.classList.add('closing');
+    setTimeout(()=>{
+      el.classList.add('gone');
+      el.classList.remove('closing');
+      document.body.style.overflow = '';
+    }, 250);
+    localStorage.setItem('jasoor_guide_seen', '1');
+  }
+
+  function handleOverlayClick(e){
+    // إغلاق عند الضغط خارج المودال
+    if(e.target === document.getElementById('guideOverlay')) closeGuide();
+  }
+
+  // إغلاق بـ Escape
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && !document.getElementById('guideOverlay').classList.contains('gone')) closeGuide();
+  });
+
+  // عرض الدليل لأول مرة فقط
+  window.addEventListener('load', ()=>{
+    if(!localStorage.getItem('jasoor_guide_seen')){
+      // تأخير بسيط حتى يتحمّل التطبيق أولاً
+      setTimeout(openGuide, 900);
+    }
+  }, {once: false});
+
+
+  /* ════════════════════════════════════
+     CONNECTION INDICATOR
+     ════════════════════════════════════ */
+  function updateConnIndicator(){
+    const dot   = document.getElementById('connDot');
+    const label = document.getElementById('connLabel');
+    if(!dot || !label) return;
+
+    // داخل Apps Script
+    if(typeof google !== 'undefined' && google.script && google.script.run){
+      dot.className   = 'conn-dot embedded';
+      label.textContent = 'Apps Script';
+      return;
+    }
+    // خارجي: تحقق من وجود URL محفوظ
+    const url = localStorage.getItem('jasoor_gas_url') || '';
+    if(url){
+      dot.className   = 'conn-dot connected';
+      label.textContent = 'متصل';
+    } else {
+      dot.className   = 'conn-dot disconnected';
+      label.textContent = 'غير متصل';
+    }
+  }
+  // تحديث المؤشر عند التحميل
+  updateConnIndicator();
+
+
+  /* ════════════════════════════════════
+     SETTINGS MODAL
+     ════════════════════════════════════ */
+  function openSettings(){
+    const overlay = document.getElementById('settingsOverlay');
+    overlay.classList.remove('gone','closing');
+    document.body.style.overflow = 'hidden';
+
+    // تعبئة الحقل بالقيمة المحفوظة
+    const saved = localStorage.getItem('jasoor_gas_url') || '';
+    document.getElementById('gasUrlInput').value = saved;
+
+    // تحديث رسالة الحالة
+    const statusEl   = document.getElementById('settingsStatus');
+    const statusText = document.getElementById('settingsStatusText');
+
+    if(typeof google !== 'undefined' && google.script && google.script.run){
+      statusEl.className  = 'settings-status info';
+      statusText.textContent = '✅ يعمل داخل Apps Script — الاتصال مباشر ولا حاجة للرابط.';
+    } else if(saved){
+      statusEl.className  = 'settings-status ok';
+      statusText.textContent = '✅ رابط محفوظ — التطبيق متصل بـ Apps Script.';
+    } else {
+      statusEl.className  = 'settings-status er';
+      statusText.textContent = '⚠️ لم يُحدَّد رابط بعد — أدخل رابط Web App أدناه.';
+    }
+  }
+
+  function closeSettings(){
+    const overlay = document.getElementById('settingsOverlay');
+    overlay.classList.add('closing');
+    setTimeout(()=>{
+      overlay.classList.add('gone');
+      overlay.classList.remove('closing');
+      document.body.style.overflow = '';
+    }, 220);
+  }
+
+  function handleSettingsOverlayClick(e){
+    if(e.target === document.getElementById('settingsOverlay')) closeSettings();
+  }
+
+  function saveGasUrl(){
+    const val = (document.getElementById('gasUrlInput').value || '').trim();
+
+    if(!val){
+      alert('يرجى إدخال الرابط أولاً.');
+      return;
+    }
+    if(!val.startsWith('https://script.google.com')){
+      alert('الرابط غير صحيح.\nيجب أن يبدأ بـ: https://script.google.com');
+      return;
+    }
+
+    localStorage.setItem('jasoor_gas_url', val);
+    updateConnIndicator();
+    closeSettings();
+    showMsg('✓ تم حفظ الرابط — جاري إعادة تحميل البيانات…', true);
+
+    // إعادة تحميل التطبيق بالرابط الجديد
+    setTimeout(() => window.location.reload(), 1200);
+  }
+
+  // إغلاق نافذة الإعدادات بـ Escape
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      if(!document.getElementById('settingsOverlay').classList.contains('gone')) closeSettings();
+    }
+  });
+
+
+  /* ════════════════════════════════════
+     UNDO SYSTEM – التراجع عن آخر عملية
+     ════════════════════════════════════ */
+  let undoStack = [];
+
+  function pushUndoSnapshot(){
+    // نسخ الحالة الحالية قبل أي تعديل
+    undoStack.push({
+      present: [...present],
+      absent:  [...absent]
+    });
+    document.getElementById('undoBtn').classList.remove('gone');
+  }
+
+  function undoLast(){
+    if(!undoStack.length) return;
+    const snap = undoStack.pop();
+    present = snap.present;
+    absent  = snap.absent;
+    filterAndRender();
+    if(!undoStack.length){
+      document.getElementById('undoBtn').classList.add('gone');
+    }
+    showMsg('تم التراجع عن آخر عملية ↩', true);
+  }
+
+  // ── تغليف الدوال المؤثرة على الحالة بدون تعديل الكود الأصلي ──
+  (function(){
+    const _move = window.move || move;
+    window.move = function(id, from){
+      pushUndoSnapshot();
+      _move(id, from);
+    };
+
+    const _setAllPresent = window.setAllPresent || setAllPresent;
+    window.setAllPresent = function(){
+      pushUndoSnapshot();
+      _setAllPresent();
+    };
+
+    const _setAllAbsent = window.setAllAbsent || setAllAbsent;
+    window.setAllAbsent = function(){
+      pushUndoSnapshot();
+      _setAllAbsent();
+    };
+
+    const _submitAttendance = window.submitAttendance || submitAttendance;
+    window.submitAttendance = function(){
+      // بعد الحفظ الناجح يُفرَّغ مكدس التراجع (البيانات محفوظة في السحابة)
+      undoStack = [];
+      document.getElementById('undoBtn').classList.add('gone');
+      _submitAttendance();
+    };
+  })();
+
+  /* ════════════════════════════════════════════════════════════════
+     DRAFT SYSTEM – الذاكرة التاريخية والحفظ التلقائي المحلي
+     يحمي البيانات من انقطاع الإنترنت قبل الحفظ في الشيت
+     ════════════════════════════════════════════════════════════════ */
+  let _draftInteracted   = false; // يصبح true عند أول تعديل من المستخدم
+  let _pendingDraftClear = null;  // تاريخ مُنتظر مسح مسودته بعد الحفظ
+  let _currentDraft      = null;  // بيانات المسودة المقترحة للاستعادة
+  let _draftTimer        = null;  // مؤقت إظهار مؤشر الحفظ التلقائي
+
+  // ── حفظ المسودة تلقائياً في localStorage ──
+  function autoDraft(){
+    if(!_draftInteracted || !all.length) return;
+    const date = document.getElementById('datePicker').value;
+    if(!date) return;
+    const attendance = {};
+    all.forEach(s  => { attendance[s.id] = true;  });
+    absent.forEach(s => { attendance[s.id] = false; });
+    try {
+      localStorage.setItem('jasoor_draft_' + date, JSON.stringify({
+        date, attendance, savedAt: Date.now()
+      }));
+    } catch(e){ return; }
+    // إظهار مؤشر "حُفظت مسودة" لمدة قصيرة
+    const ind = document.getElementById('draftIndicator');
+    if(ind){
+      ind.classList.add('show');
+      clearTimeout(_draftTimer);
+      _draftTimer = setTimeout(()=>{ ind.classList.remove('show'); }, 1800);
+    }
+  }
+
+  // ── مسح مسودة يوم محدد ──
+  function clearDraft(date){
+    try { localStorage.removeItem('jasoor_draft_' + date); } catch(e){}
+    _currentDraft = null;
+    document.getElementById('draftBanner').classList.add('gone');
+  }
+
+  // ── فحص وجود مسودة مختلفة عن بيانات السيرفر ──
+  function checkDraftForDate(date, serverMap){
+    if(!date || !all.length) return;
+    let raw;
+    try { raw = localStorage.getItem('jasoor_draft_' + date); } catch(e){ return; }
+    if(!raw) return;
+    let draft;
+    try { draft = JSON.parse(raw); } catch(e){ return; }
+    if(!draft || !draft.attendance) return;
+
+    // مقارنة كل طالب: هل المسودة تختلف عن السيرفر؟
+    let differs = false;
+    for(const s of all){
+      const dv = (draft.attendance[s.id] !== false); // true = حاضر
+      const sv = (serverMap[s.id]        !== false);
+      if(dv !== sv){ differs = true; break; }
+    }
+    if(!differs){
+      // مطابقة → حُفظت سابقاً → نمسحها صامتين
+      clearDraft(date);
+      return;
+    }
+    // يوجد فرق: عرض بانر الاستعادة
+    _currentDraft = draft;
+    const d = new Date(draft.savedAt);
+    const timeStr = d.toLocaleTimeString('ar-SA', {
+      hour: '2-digit', minute: '2-digit', hour12: true
+    });
+    document.getElementById('draftTime').textContent = timeStr;
+    document.getElementById('draftBanner').classList.remove('gone');
+  }
+
+  // ── استعادة المسودة ──
+  function restoreDraft(){
+    if(!_currentDraft) return;
+    document.getElementById('draftBanner').classList.add('gone');
+    _draftInteracted = false; // تعطيل الحفظ التلقائي مؤقتاً أثناء الاستعادة
+    applyMap(_currentDraft.attendance);
+    _draftInteracted = true;
+    showMsg('✓ تم استعادة آخر مسودة محفوظة محلياً', true);
+  }
+
+  // ── تجاهل المسودة ──
+  function discardDraft(){
+    const date = document.getElementById('datePicker').value;
+    clearDraft(date);
+  }
+
+  // ── مراقبة statusMsg لمسح المسودة بعد الحفظ الناجح في السحابة ──
+  (function(){
+    const statusEl = document.getElementById('statusMsg');
+    if(!statusEl) return;
+    const obs = new MutationObserver(()=>{
+      if(_pendingDraftClear
+         && statusEl.classList.contains('ok')
+         && statusEl.style.display !== 'none'){
+        clearDraft(_pendingDraftClear);
+        _pendingDraftClear = null;
+      }
+    });
+    obs.observe(statusEl, { attributes: true, attributeFilter: ['class','style'] });
+  })();
+
+  // ── تغليف الدوال المؤثرة على الحالة لتفعيل الحفظ التلقائي ──
+  (function(){
+    // move
+    const _moveDraft = window.move;
+    window.move = function(id, from){
+      _draftInteracted = true;
+      _moveDraft(id, from);
+      autoDraft();
+    };
+    // setAllPresent
+    const _sapDraft = window.setAllPresent;
+    window.setAllPresent = function(){
+      _draftInteracted = true;
+      _sapDraft();
+      autoDraft();
+    };
+    // setAllAbsent
+    const _saaDraft = window.setAllAbsent;
+    window.setAllAbsent = function(){
+      _draftInteracted = true;
+      _saaDraft();
+      autoDraft();
+    };
+    // submitAttendance: تسجيل التاريخ المُراد مسح مسودته
+    const _submitDraft = window.submitAttendance;
+    window.submitAttendance = function(){
+      _pendingDraftClear = document.getElementById('datePicker').value;
+      _submitDraft();
+    };
+  })();
+
+  // ── مراقبة attendanceUI للكشف عن تحميل بيانات جديدة من السيرفر ──
+  // يغطي حالتين: (1) التحميل الأول  (2) تغيير التاريخ
+  (function(){
+    const attUI = document.getElementById('attendanceUI');
+    if(!attUI) return;
+    let initChecked = false;
+    let prevDim     = null;
+
+    const runCheck = ()=>{
+      const date = document.getElementById('datePicker').value;
+      if(date && all.length) checkDraftForDate(date, origMap);
+    };
+
+    const obs = new MutationObserver(()=>{
+      const hasDim  = attUI.classList.contains('dim');
+      const hasGone = attUI.classList.contains('gone');
+
+      // حالة 1: التحميل الأوّل – 'gone' يُزال وتظهر الواجهة
+      if(!hasGone && !hasDim && !initChecked){
+        initChecked = true;
+        setTimeout(runCheck, 150);
+      }
+      // حالة 2: تغيير التاريخ – 'dim' يُزال بعد رجوع البيانات من السيرفر
+      if(!hasGone && prevDim === true && !hasDim){
+        setTimeout(runCheck, 150);
+      }
+      prevDim = hasDim;
+    });
+    obs.observe(attUI, { attributes: true, attributeFilter: ['class'] });
+  })();
+</script>
+</body>
+</html>

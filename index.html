@@ -700,6 +700,84 @@
     .sec-search::placeholder{color:var(--text-3)}
 
     /* ══════════════════════════════════════
+       UNDO TOAST – شريط التراجع الدائم
+       ══════════════════════════════════════ */
+    .undo-toast{
+      position:fixed;
+      bottom:88px; /* فوق زر الحفظ */
+      left:50%;transform:translateX(-50%);
+      z-index:9000;
+      background:#1a1a2e;
+      color:#fff;
+      border-radius:var(--r-md);
+      box-shadow:0 8px 32px rgba(0,0,0,.32);
+      min-width:300px;max-width:420px;
+      width:calc(100% - 32px);
+      overflow:hidden;
+      animation:toastIn .3s cubic-bezier(.34,1.4,.64,1);
+      pointer-events:all;
+    }
+    @keyframes toastIn{
+      from{opacity:0;transform:translateX(-50%) translateY(20px)}
+      to{opacity:1;transform:translateX(-50%) translateY(0)}
+    }
+    .undo-toast.hiding{
+      animation:toastOut .25s ease-in forwards;
+    }
+    @keyframes toastOut{
+      to{opacity:0;transform:translateX(-50%) translateY(16px)}
+    }
+    .undo-toast-body{
+      display:flex;align-items:center;gap:12px;
+      padding:13px 14px;
+    }
+    .undo-toast-icon{
+      width:34px;height:34px;border-radius:8px;
+      flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    }
+    .undo-toast-icon svg{width:17px;height:17px}
+    .undo-toast-icon.edit{background:rgba(59,130,246,.25);color:#60a5fa}
+    .undo-toast-icon.transfer{background:rgba(16,185,129,.25);color:#34d399}
+    .undo-toast-icon.delete{background:rgba(239,68,68,.25);color:#f87171}
+
+    .undo-toast-text{flex:1;min-width:0}
+    .undo-toast-label{font-size:13px;font-weight:700;color:#fff}
+    .undo-toast-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+
+    .undo-toast-btn{
+      height:36px;padding:0 16px;
+      background:rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:8px;
+      color:#fff;font-family:var(--font);
+      font-size:13px;font-weight:700;
+      cursor:pointer;white-space:nowrap;
+      flex-shrink:0;
+      transition:background .15s;
+    }
+    .undo-toast-btn:hover{background:rgba(255,255,255,.25)}
+    .undo-toast-btn:active{transform:scale(.95)}
+
+    .undo-toast-dismiss{
+      width:30px;height:30px;border-radius:7px;border:none;
+      background:transparent;color:rgba(255,255,255,.4);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;flex-shrink:0;
+      transition:color .14s;
+    }
+    .undo-toast-dismiss:hover{color:#fff}
+    .undo-toast-dismiss svg{width:13px;height:13px}
+
+    .undo-toast-progress{
+      height:3px;background:rgba(255,255,255,.12);
+    }
+    .undo-toast-bar{
+      height:100%;background:rgba(255,255,255,.45);
+      width:100%;
+      transition:width linear;
+    }
+
+    /* ══════════════════════════════════════
        CONTEXT MENU – قائمة اللمسة المطولة
        ══════════════════════════════════════ */
     .ctx-menu{
@@ -1276,7 +1354,7 @@
       <!-- Logo -->
       <div class="logo">
         <div class="logo-mark">ج</div>
-        <span class="logo-name">جسور</span>
+        <span class="logo-name">نظام الحضور</span>
       </div>
 
       <!-- Controls (wrap on mobile) -->
@@ -1623,7 +1701,7 @@
         دليل الاستخدام
       </div>
 
-      <div class="guide-title">مرحباً بك في جسور 👋</div>
+      <div class="guide-title">مرحباً بك 👋</div>
       <div class="guide-sub">دليل سريع لتسجيل الحضور بشكل صحيح خلال دقيقة واحدة</div>
 
       <div class="guide-steps">
@@ -1680,6 +1758,28 @@
         فهمت، لنبدأ!
       </button>
 
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       UNDO TOAST
+       ══════════════════════════════════════ -->
+  <div id="undoToast" class="undo-toast gone">
+    <div class="undo-toast-body">
+      <div class="undo-toast-icon edit" id="undoToastIcon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+      <div class="undo-toast-text">
+        <div class="undo-toast-label" id="undoToastLabel">تم تعديل الطالب</div>
+        <div class="undo-toast-sub" id="undoToastSub">اضغط تراجع لإلغاء العملية</div>
+      </div>
+      <button class="undo-toast-btn" onclick="triggerUndo()">↩ تراجع</button>
+      <button class="undo-toast-dismiss" onclick="dismissUndoToast()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="undo-toast-progress">
+      <div class="undo-toast-bar" id="undoToastBar"></div>
     </div>
   </div>
 
@@ -1842,7 +1942,7 @@
   // ══════════════════════════════════════════════════════════════
   // ★★★  ضع رابط نشر Apps Script هنا  ★★★
   // ══════════════════════════════════════════════════════════════
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbxj80N4RdKzsR_z-IbOhEUMqzr2BdHbVYSlsyexBwHrMKrN1Se_62861zKUrh7CWgL2/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwhSr1H3Qgej16TgDbuXvZGgwlhvHm3_WfekcCmpNPKzNDGuj6zWmgeErLjS8OL1mN0/exec';
 
   // تحديث localStorage دائماً بالرابط المضمّن
   try { localStorage.setItem('jasoor_gas_url', GAS_URL); } catch(e){}
@@ -2273,6 +2373,53 @@
   }
 
   /* ════════════════════════════════════════════════════════════════
+     UNDO TOAST SYSTEM
+     ════════════════════════════════════════════════════════════════ */
+  let _undoAction   = null;
+  let _undoTimer    = null;
+  const UNDO_DURATION = 15000;
+
+  function showUndoToast(type, label, sub, revertFn){
+    clearTimeout(_undoTimer);
+    _undoAction = { revertFn };
+    const icons = {
+      edit:     `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+      transfer: `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>`,
+      delete:   `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`
+    };
+    document.getElementById('undoToastIcon').className = 'undo-toast-icon ' + type;
+    document.getElementById('undoToastIcon').innerHTML = icons[type] || icons.edit;
+    document.getElementById('undoToastLabel').textContent = label;
+    document.getElementById('undoToastSub').textContent   = sub;
+    const toast = document.getElementById('undoToast');
+    const bar   = document.getElementById('undoToastBar');
+    toast.classList.remove('gone','hiding');
+    bar.style.transition = 'none';
+    bar.style.width = '100%';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      bar.style.transition = `width ${UNDO_DURATION}ms linear`;
+      bar.style.width = '0%';
+    }));
+    _undoTimer = setTimeout(dismissUndoToast, UNDO_DURATION);
+  }
+
+  function dismissUndoToast(){
+    clearTimeout(_undoTimer);
+    _undoAction = null;
+    const toast = document.getElementById('undoToast');
+    toast.classList.add('hiding');
+    setTimeout(()=>toast.classList.add('gone'), 260);
+  }
+
+  function triggerUndo(){
+    if(!_undoAction) return;
+    const fn = _undoAction.revertFn;
+    dismissUndoToast();
+    showMsg('جاري التراجع…', true);
+    fn();
+  }
+
+  /* ════════════════════════════════════════════════════════════════
      EDIT MODAL
      ════════════════════════════════════════════════════════════════ */
   function openEditModal(){
@@ -2296,22 +2443,28 @@
     const section = document.getElementById('editSection').value.trim();
     const notes   = document.getElementById('editNotes').value.trim();
     if(!name){ alert('الاسم لا يمكن أن يكون فارغاً'); return; }
-    const studentId = _ctxStudent.id; // احفظ الـ id قبل أي إغلاق
+    const studentId = _ctxStudent.id;
+    const s = all.find(x => x.id === studentId);
+    const oldState = s ? { name:s.name, section:s.section, notes:s.notes||'' } : null;
     document.getElementById('editOverlay').classList.add('gone');
     _ctxStudent = null;
     showMsg('جاري حفظ التعديلات…', true);
-    gasCall('editStudent', { id: studentId, name, section, notes })
-      .then(msg => {
-        const s = all.find(x => x.id === studentId);
-        if(s){ s.name = name; s.section = section; s.notes = notes; }
-        [present, absent].forEach(arr => {
-          const ss = arr.find(x => x.id === studentId);
-          if(ss){ ss.name = name; ss.section = section; }
-        });
+    gasCall('editStudent', { id:studentId, name, section, notes })
+      .then(()=>{
+        if(s){ s.name=name; s.section=section; s.notes=notes; }
+        [present,absent].forEach(arr=>{ const ss=arr.find(x=>x.id===studentId); if(ss){ss.name=name;ss.section=section;} });
         filterAndRender();
-        showMsg(msg || 'تم تحديث البيانات ✓', true);
-      })
-      .catch(e => showMsg('خطأ: ' + e.message, false));
+        showMsg('تم تحديث البيانات ✓', true);
+        if(oldState) showUndoToast('edit', `تم تعديل: ${name}`, 'اضغط تراجع لاستعادة البيانات القديمة', ()=>{
+          gasCall('editStudent', { id:studentId, ...oldState })
+            .then(()=>{
+              if(s){ s.name=oldState.name; s.section=oldState.section; s.notes=oldState.notes; }
+              [present,absent].forEach(arr=>{ const ss=arr.find(x=>x.id===studentId); if(ss){ss.name=oldState.name;ss.section=oldState.section;} });
+              filterAndRender();
+              showMsg('تم التراجع عن التعديل ✓', true);
+            }).catch(e=>showMsg('فشل التراجع: '+e.message, false));
+        });
+      }).catch(e=>showMsg('خطأ: '+e.message, false));
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -2321,14 +2474,10 @@
     if(!_ctxStudent) return;
     closeCtxMenu();
     document.getElementById('transferStudentName').textContent = _ctxStudent.name;
-    // ملء قائمة الشعب
     const sel = document.getElementById('transferSection');
     sel.innerHTML = '';
-    const allSections = [...new Set(all.map(s=>s.section))].sort();
-    allSections.filter(sec => sec !== _ctxStudent.section).forEach(sec => {
-      const o = document.createElement('option');
-      o.value = sec; o.textContent = 'شعبة ' + sec;
-      sel.appendChild(o);
+    [...new Set(all.map(s=>s.section))].sort().filter(sec=>sec!==_ctxStudent.section).forEach(sec=>{
+      const o=document.createElement('option'); o.value=sec; o.textContent='شعبة '+sec; sel.appendChild(o);
     });
     document.getElementById('transferOverlay').classList.remove('gone');
   }
@@ -2340,24 +2489,31 @@
 
   function saveTransferStudent(){
     if(!_ctxStudent) return;
-    const newSection = document.getElementById('transferSection').value;
+    const newSection  = document.getElementById('transferSection').value;
     if(!newSection) return;
-    const studentId = _ctxStudent.id;
+    const studentId   = _ctxStudent.id;
+    const studentName = _ctxStudent.name;
+    const s = all.find(x=>x.id===studentId);
+    const oldSection = s ? s.section : null;
     document.getElementById('transferOverlay').classList.add('gone');
     _ctxStudent = null;
     showMsg('جاري نقل الطالب…', true);
     gasCall('transferStudent', studentId, newSection)
-      .then(msg => {
-        const s = all.find(x => x.id === studentId);
-        if(s) s.section = newSection;
-        [present, absent].forEach(arr => {
-          const ss = arr.find(x => x.id === studentId);
-          if(ss) ss.section = newSection;
-        });
+      .then(()=>{
+        if(s) s.section=newSection;
+        [present,absent].forEach(arr=>{ const ss=arr.find(x=>x.id===studentId); if(ss) ss.section=newSection; });
         filterAndRender();
-        showMsg(msg || 'تم نقل الطالب ✓', true);
-      })
-      .catch(e => showMsg('خطأ: ' + e.message, false));
+        showMsg('تم نقل الطالب ✓', true);
+        if(oldSection) showUndoToast('transfer', `تم نقل: ${studentName}`, `من شعبة ${oldSection} ← إلى شعبة ${newSection}`, ()=>{
+          gasCall('transferStudent', studentId, oldSection)
+            .then(()=>{
+              if(s) s.section=oldSection;
+              [present,absent].forEach(arr=>{ const ss=arr.find(x=>x.id===studentId); if(ss) ss.section=oldSection; });
+              filterAndRender();
+              showMsg('تم التراجع عن النقل ✓', true);
+            }).catch(e=>showMsg('فشل التراجع: '+e.message, false));
+        });
+      }).catch(e=>showMsg('خطأ: '+e.message, false));
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -2377,20 +2533,32 @@
 
   function confirmDeleteStudent(){
     if(!_ctxStudent) return;
-    const studentId = _ctxStudent.id;
+    const studentId   = _ctxStudent.id;
+    const studentName = _ctxStudent.name;
+    const snapshot = all.find(x=>x.id===studentId);
+    const backup = snapshot ? {...snapshot} : null;
     document.getElementById('deleteOverlay').classList.add('gone');
     _ctxStudent = null;
-    showMsg('جاري الحذف وإعادة الفهرسة…', true);
+    showMsg('جاري الحذف…', true);
     gasCall('deleteStudent', studentId)
-      .then(msg => {
-        all     = all.filter(s => s.id !== studentId);
-        present = present.filter(s => s.id !== studentId);
-        absent  = absent.filter(s => s.id !== studentId);
+      .then(()=>{
+        all     = all.filter(s=>s.id!==studentId);
+        present = present.filter(s=>s.id!==studentId);
+        absent  = absent.filter(s=>s.id!==studentId);
         document.getElementById('stat-total').textContent = all.length;
         filterAndRender();
-        showMsg(msg || 'تم الحذف وإعادة الترقيم ✓', true);
-      })
-      .catch(e => showMsg('خطأ: ' + e.message, false));
+        showMsg('تم الحذف ✓', true);
+        if(backup) showUndoToast('delete', `تم حذف: ${studentName}`, 'اضغط تراجع لاستعادة الطالب خلال 15 ثانية', ()=>{
+          gasCall('restoreStudent', backup)
+            .then(()=>{
+              all.push(backup);
+              present.push(backup);
+              document.getElementById('stat-total').textContent = all.length;
+              filterAndRender();
+              showMsg('تم استعادة الطالب ✓', true);
+            }).catch(e=>showMsg('فشل التراجع: '+e.message, false));
+        });
+      }).catch(e=>showMsg('خطأ: '+e.message, false));
   }
 
   /* ════════════════════════════════════

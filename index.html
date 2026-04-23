@@ -330,26 +330,63 @@
       .qa-btn{padding:0 11px;width:42px;justify-content:center}
     }
 
-    /* tabs */
-    .tabs{
-      display:none;
-      background:var(--surface-2);
-      border:1px solid var(--border-med);
-      border-radius:var(--r-sm);
-      padding:4px;gap:4px;flex-shrink:0;
-    }
-    @media(max-width:767px){.tabs{display:flex}}
+    /* tabs – مخفية في الشريط العلوي على الموبايل */
+    .tabs{ display:none; }
 
-    .tab{
-      height:34px;padding:0 13px;
-      border-radius:6px;border:none;
-      background:transparent;
-      font-family:var(--font);font-size:14px;font-weight:600;
-      color:var(--text-2);cursor:pointer;white-space:nowrap;
-      transition:background .14s,color .14s;
+    /* ── الشريط الجانبي الثابت على اليمين (موبايل فقط) ── */
+    .side-tabs{
+      display:none; /* مخفي على الديسكتوب */
     }
-    .tab.ag{background:var(--green-badge);color:var(--green-text)}
-    .tab.ar{background:var(--red-badge);color:var(--red-text)}
+    @media(max-width:767px){
+      .side-tabs{
+        display:flex;
+        flex-direction:column;
+        position:fixed;
+        right:0;
+        top:50%;
+        transform:translateY(-50%);
+        z-index:500;
+        gap:0;
+        border-radius:var(--r-md) 0 0 var(--r-md);
+        overflow:hidden;
+        box-shadow:-3px 0 16px rgba(0,0,0,.12);
+      }
+      .side-tab{
+        writing-mode:vertical-rl;
+        text-orientation:mixed;
+        transform:rotate(180deg);
+        height:90px;
+        width:36px;
+        border:none;
+        font-family:var(--font);
+        font-size:13px;font-weight:800;
+        cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+        gap:6px;
+        transition:all .18s;
+        white-space:nowrap;
+        padding:10px 0;
+        letter-spacing:.03em;
+      }
+      .side-tab.present-tab{
+        background:var(--green-badge);
+        color:var(--green-text);
+        border-bottom:2px solid var(--green-border);
+      }
+      .side-tab.absent-tab{
+        background:var(--red-badge);
+        color:var(--red-text);
+      }
+      .side-tab.inactive{
+        background:var(--surface-2);
+        color:var(--text-3);
+      }
+      .side-tab:active{opacity:.75}
+      /* إخفاء cols غير النشط */
+      #col-p.hidden-col, #col-a.hidden-col{ display:none!important; }
+      /* تقليل padding للمحتوى بسبب الشريط الجانبي */
+      .cols{ padding-left:46px; }
+    }
 
     /* ══════════════════════════════════════
        DASHBOARD LAYOUT
@@ -698,6 +735,98 @@
     }
     .sec-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-alpha)}
     .sec-search::placeholder{color:var(--text-3)}
+
+    /* ══════════════════════════════════════
+       NEW STUDENT MODAL
+       ══════════════════════════════════════ */
+    .new-student-overlay{
+      position:fixed;inset:0;z-index:9600;
+      background:rgba(0,0,0,.5);
+      backdrop-filter:blur(4px);
+      display:flex;align-items:center;justify-content:center;
+      padding:12px;
+      overflow-y:auto;
+    }
+    .new-student-modal{
+      background:var(--surface);
+      border-radius:var(--r-lg);
+      width:100%;max-width:560px;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+      animation:ctxPop .2s ease-out;
+      margin:auto;
+    }
+    .new-student-hdr{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 20px 14px;
+      border-bottom:1px solid var(--border);
+    }
+    .new-student-title{
+      font-size:16px;font-weight:700;color:var(--text-1);
+      display:flex;align-items:center;gap:9px;
+    }
+    .new-student-title svg{width:18px;height:18px;color:var(--green)}
+    .new-student-body{padding:18px 20px}
+    .ns-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    @media(max-width:480px){.ns-grid{grid-template-columns:1fr}}
+    .ns-field{display:flex;flex-direction:column;gap:5px}
+    .ns-field.full{grid-column:1/-1}
+    .ns-label{font-size:12px;font-weight:700;color:var(--text-2)}
+    .ns-label .req{color:var(--accent);margin-right:2px}
+    .ns-input{
+      height:42px;padding:0 12px;
+      background:var(--surface-2);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-sm);
+      font-family:var(--font);font-size:14px;
+      color:var(--text-1);outline:none;
+      transition:border-color .18s,box-shadow .18s;
+    }
+    .ns-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+    .ns-input::placeholder{color:var(--text-3)}
+    .ns-select{
+      height:42px;padding:0 12px;
+      background:var(--surface-2);
+      border:1px solid var(--border-med);
+      border-radius:var(--r-sm);
+      font-family:var(--font);font-size:14px;
+      color:var(--text-1);outline:none;
+      cursor:pointer;
+      appearance:none;-webkit-appearance:none;
+      transition:border-color .18s;
+    }
+    .ns-select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+    .ns-footer{
+      padding:14px 20px 18px;
+      display:flex;gap:9px;justify-content:flex-end;
+      border-top:1px solid var(--border);
+    }
+    .ns-submit-btn{
+      height:44px;padding:0 24px;
+      background:var(--green);color:#fff;
+      border:none;border-radius:var(--r-sm);
+      font-family:var(--font);font-size:14px;font-weight:700;
+      cursor:pointer;transition:opacity .15s,transform .12s;
+      display:flex;align-items:center;gap:8px;
+    }
+    .ns-submit-btn:hover{opacity:.88}
+    .ns-submit-btn:active{transform:scale(.97)}
+    .ns-submit-btn svg{width:16px;height:16px}
+    .ns-success-box{
+      text-align:center;padding:36px 20px;
+    }
+    .ns-success-icon{
+      width:60px;height:60px;border-radius:50%;
+      background:var(--green-badge);
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 16px;
+    }
+    .ns-success-icon svg{width:28px;height:28px;color:var(--green)}
+    .ns-success-name{font-size:18px;font-weight:700;color:var(--text-1);margin-bottom:6px}
+    .ns-success-sub{font-size:13px;color:var(--text-2);line-height:1.6}
 
     /* ══════════════════════════════════════
        UNDO TOAST – شريط التراجع الدائم
@@ -1354,7 +1483,7 @@
       <!-- Logo -->
       <div class="logo">
         <div class="logo-mark">ج</div>
-        <span class="logo-name">نظام الحضور</span>
+        <span class="logo-name">دورة البكالوريا المكثفة</span>
       </div>
 
       <!-- Controls (wrap on mobile) -->
@@ -1364,6 +1493,12 @@
         <button id="toggleSecMgrBtn" class="dash-btn" onclick="openSectionsMgr()" title="إدارة الشعب">
           <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span class="mob-hide">الشعب</span>
+        </button>
+
+        <!-- Add new student button -->
+        <button class="dash-btn" onclick="openAddStudentModal()" title="إضافة طالب جديد" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green-text)">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          <span class="mob-hide">طالب جديد</span>
         </button>
 
         <!-- Dashboard toggle -->
@@ -1513,8 +1648,8 @@
         </button>
       </div>
 
-      <!-- Mobile tabs -->
-      <div class="tabs" id="tabs">
+      <!-- Mobile tabs – مخفية من الشريط العلوي -->
+      <div class="tabs gone" id="tabs">
         <button class="tab ag" id="tab-p" onclick="switchTab('present')">حضور (<span id="tp-n">0</span>)</button>
         <button class="tab"    id="tab-a" onclick="switchTab('absent')">غياب (<span id="ta-n">0</span>)</button>
       </div>
@@ -1543,9 +1678,15 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════
-       DASHBOARD UI
-       ══════════════════════════════════════ -->
+  <!-- ── الشريط الجانبي الثابت (موبايل فقط) ── -->
+  <div class="side-tabs" id="sideTabs">
+    <button class="side-tab present-tab" id="sideTabP" onclick="switchTab('present')">
+      حضور<br><span id="stp-n" style="font-size:16px;font-weight:900">0</span>
+    </button>
+    <button class="side-tab absent-tab inactive" id="sideTabA" onclick="switchTab('absent')">
+      غياب<br><span id="sta-n" style="font-size:16px;font-weight:900">0</span>
+    </button>
+  </div>
   <div id="dashboardUI" class="gone">
 
     <!-- Meta info bar -->
@@ -1557,15 +1698,9 @@
       </div>
       <div class="dash-meta-divider"></div>
       <div class="dash-meta-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>إجمالي الطلاب: </span>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span>الطلاب: </span>
         <span class="dash-meta-val" id="metaTotal">—</span>
-      </div>
-      <div class="dash-meta-divider"></div>
-      <div class="dash-meta-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        <span>أيام مسجلة: </span>
-        <span class="dash-meta-val" id="metaDays">—</span>
       </div>
       <div class="dash-meta-divider"></div>
       <div class="dash-meta-item">
@@ -1577,51 +1712,22 @@
 
     <div class="dash-grid">
 
-      <!-- 🚨 تنبيهات الغياب المتكرر -->
+      <!-- 📈 اتجاه نسبة الحضور -->
       <div class="dash-card">
         <div class="dash-card-title">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-          <span>تنبيه: غياب 3 أيام متواصلة</span>
-          <span id="alertsBadge" style="margin-right:auto"></span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+          اتجاه نسبة الحضور – آخر 7 أيام نشطة
         </div>
-        <div id="alertsContainer"></div>
+        <div id="trendContainer"></div>
       </div>
 
-      <!-- ⚠️ طلاب في خطر -->
-      <div class="dash-card">
-        <div class="dash-card-title">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          <span>طلاب تجاوزوا 25% غياب</span>
-          <span id="atRiskBadge" style="margin-right:auto"></span>
-        </div>
-        <div id="atRiskContainer"></div>
-      </div>
-
-      <!-- 📊 إحصاء الشعب -->
+      <!-- 📊 انضباط الطلاب حسب الشعب -->
       <div class="dash-card">
         <div class="dash-card-title">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          ترتيب الشعب حسب الانضباط
+          انضباط الطلاب حسب الشعبة
         </div>
         <div id="sectionStatsContainer"></div>
-      </div>
-
-      <!-- 📅 آخر 7 أيام نشطة -->
-      <div class="dash-card">
-        <div class="dash-card-title">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          سجل آخر 7 أيام نشطة
-        </div>
-        <div id="recentDaysContainer"></div>
-      </div>
-
-      <!-- 🏅 الأكثر غياباً -->
-      <div class="dash-card">
-        <div class="dash-card-title">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-          الطلاب الأكثر غياباً
-        </div>
-        <div id="topAbsentContainer"></div>
       </div>
 
     </div>
@@ -1758,6 +1864,97 @@
         فهمت، لنبدأ!
       </button>
 
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       NEW STUDENT MODAL
+       ══════════════════════════════════════ -->
+  <div id="newStudentOverlay" class="new-student-overlay gone" onclick="if(event.target===this)closeAddStudentModal()">
+    <div class="new-student-modal">
+      <div class="new-student-hdr">
+        <div class="new-student-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          تسجيل طالب جديد
+        </div>
+        <button class="admin-modal-close" onclick="closeAddStudentModal()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- نموذج التسجيل -->
+      <div class="new-student-body" id="nsFormBody">
+        <div class="ns-grid">
+
+          <div class="ns-field full">
+            <label class="ns-label"><span class="req">*</span> الاسم الثلاثي</label>
+            <input id="nsName" class="ns-input" type="text" placeholder="مثال: فاطمة أحمد محمد">
+          </div>
+
+          <div class="ns-field">
+            <label class="ns-label"><span class="req">*</span> الجنس</label>
+            <select id="nsGender" class="ns-select">
+              <option value="">— اختر —</option>
+              <option value="أنثى">أنثى</option>
+              <option value="ذكر">ذكر</option>
+            </select>
+          </div>
+
+          <div class="ns-field">
+            <label class="ns-label">تاريخ الميلاد</label>
+            <input id="nsBirthDate" class="ns-input" type="date">
+          </div>
+
+          <div class="ns-field">
+            <label class="ns-label"><span class="req">*</span> اسم وليّ الأمر</label>
+            <input id="nsParentName" class="ns-input" type="text" placeholder="اسم وليّ الأمر الكامل">
+          </div>
+
+          <div class="ns-field">
+            <label class="ns-label">نوع الدراسة</label>
+            <select id="nsStudyType" class="ns-select">
+              <option value="">— اختر —</option>
+              <option value="انتظام">انتظام</option>
+              <option value="مسائي">مسائي</option>
+              <option value="مفتوح">مفتوح</option>
+              <option value="عن بُعد">عن بُعد</option>
+            </select>
+          </div>
+
+          <div class="ns-field">
+            <label class="ns-label">تخصص الدراسة</label>
+            <input id="nsSpecialty" class="ns-input" type="text" placeholder="مثال: علوم حاسوب">
+          </div>
+
+          <div class="ns-field">
+            <label class="ns-label">رقم التواصل (الطالب)</label>
+            <input id="nsPhone" class="ns-input" type="tel" placeholder="05XXXXXXXX" dir="ltr">
+          </div>
+
+          <div class="ns-field">
+            <label class="ns-label">رقم تواصل وليّ الأمر</label>
+            <input id="nsParentPhone" class="ns-input" type="tel" placeholder="05XXXXXXXX" dir="ltr">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- شاشة النجاح -->
+      <div class="ns-success-box gone" id="nsSuccessBox">
+        <div class="ns-success-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div class="ns-success-name" id="nsSuccessName"></div>
+        <div class="ns-success-sub">تم تسجيل الطالب بنجاح في ورقة<br><strong>بيانات الطلاب الجدد</strong></div>
+      </div>
+
+      <div class="ns-footer" id="nsFooter">
+        <button class="admin-btn cancel" onclick="closeAddStudentModal()">إلغاء</button>
+        <button class="ns-submit-btn" onclick="submitNewStudent()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          تسجيل الطالب
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1942,7 +2139,7 @@
   // ══════════════════════════════════════════════════════════════
   // ★★★  ضع رابط نشر Apps Script هنا  ★★★
   // ══════════════════════════════════════════════════════════════
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwhSr1H3Qgej16TgDbuXvZGgwlhvHm3_WfekcCmpNPKzNDGuj6zWmgeErLjS8OL1mN0/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwvw5lh48lwJn7uxiTiv59yPaZhbuHTSnmOpyyF3hhUB2aoTDJCzX2HGasNBmlVIBY_/exec';
 
   // تحديث localStorage دائماً بالرابط المضمّن
   try { localStorage.setItem('jasoor_gas_url', GAS_URL); } catch(e){}
@@ -2191,133 +2388,133 @@
   }
 
   /* ════════════════════════════════════════════════════════════════
-     NEW DASHBOARD RENDERING – بدون مخططات، فقط بيانات قابلة للعمل
+     NEW DASHBOARD RENDERING – فقط الاتجاه + الشعب
      ════════════════════════════════════════════════════════════════ */
   function renderDashboard(data){
     renderDashboardMeta(data.meta);
-    if(data.meta && data.meta.noData){
-      ['alertsContainer','atRiskContainer','sectionStatsContainer','recentDaysContainer','topAbsentContainer']
-        .forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.innerHTML = `<div class="dash-empty">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <p>لا توجد بيانات بعد</p></div>`;
-        });
-      return;
-    }
+    const noData = data.meta && data.meta.noData;
 
-    // ── 1. تنبيهات الغياب المتكرر ──
-    const alertsEl = document.getElementById('alertsContainer');
-    const badge1   = document.getElementById('alertsBadge');
-    if(data.alerts && data.alerts.length > 0){
-      badge1.innerHTML = `<span class="dash-alert-badge">⚠️ ${data.alerts.length}</span>`;
-      alertsEl.innerHTML = `<table class="risk-table">
-        <thead><tr><th>الاسم</th><th>الشعبة</th><th>أيام متتالية</th></tr></thead>
-        <tbody>${data.alerts.map(s=>`
-          <tr>
-            <td><strong>${s.name}</strong></td>
-            <td>شعبة ${s.section}</td>
-            <td><span class="streak-badge">🔴 ${s.streak} أيام</span></td>
-          </tr>`).join('')}</tbody>
-      </table>`;
+    // ── 1. اتجاه نسبة الحضور (آخر 7 أيام) ──
+    const trendEl = document.getElementById('trendContainer');
+    if(noData || !data.recentDays || data.recentDays.length === 0){
+      trendEl.innerHTML = `<div class="dash-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>لا توجد بيانات بعد</p></div>`;
     } else {
-      badge1.innerHTML = `<span class="dash-ok-badge">✓ لا تنبيهات</span>`;
-      alertsEl.innerHTML = `<div class="dash-empty">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <p>🎉 لا يوجد غياب متكرر حالياً</p></div>`;
+      const dayNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+      // حساب الاتجاه: هل الأخير أكبر من الأول؟
+      const first = data.recentDays[0]?.rate || 0;
+      const last  = data.recentDays[data.recentDays.length-1]?.rate || 0;
+      const trend = last > first ? '↑' : last < first ? '↓' : '→';
+      const trendColor = last > first ? 'var(--green)' : last < first ? 'var(--red)' : 'var(--text-2)';
+
+      trendEl.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <span style="font-size:32px;font-weight:800;color:${trendColor}">${trend}</span>
+          <div>
+            <div style="font-size:22px;font-weight:800;color:var(--text-1)">${last}%</div>
+            <div style="font-size:12px;color:var(--text-2)">آخر يوم مسجَّل — كان ${first}% في البداية</div>
+          </div>
+        </div>
+        ${data.recentDays.slice().reverse().map(d => {
+          const cls = d.rate>=85?'g':d.rate>=70?'y':'r';
+          const barColor = d.rate>=85?'var(--green)':d.rate>=70?'#f59e0b':'var(--red)';
+          return `<div class="day-row">
+            <span class="day-label">${d.label}</span>
+            <span class="day-name" style="font-size:11px;color:var(--text-3);min-width:44px">${dayNames[d.dayOfWeek]||''}</span>
+            <div class="rate-bar" style="flex:1"><div class="rate-bar-fill" style="width:${d.rate}%;background:${barColor}"></div></div>
+            <span style="font-size:13px;font-weight:800;min-width:38px;text-align:left;color:${barColor}">${d.rate}%</span>
+          </div>`;
+        }).join('')}`;
     }
 
-    // ── 2. طلاب في خطر ──
-    const riskEl = document.getElementById('atRiskContainer');
-    const badge2 = document.getElementById('atRiskBadge');
-    if(data.atRisk && data.atRisk.length > 0){
-      badge2.innerHTML = `<span class="dash-alert-badge">${data.atRisk.length} طالب</span>`;
-      riskEl.innerHTML = `<table class="risk-table">
-        <thead><tr><th>الاسم</th><th>الشعبة</th><th>نسبة الغياب</th><th>أيام</th></tr></thead>
-        <tbody>${data.atRisk.map(s=>{
-          const cls = s.rate>=50?'r':s.rate>=35?'y':'r';
-          return `<tr>
-            <td><strong>${s.name}</strong></td>
-            <td>شعبة ${s.section}</td>
-            <td>
-              <div class="rate-bar-wrap">
-                <div class="rate-bar"><div class="rate-bar-fill ${cls}" style="width:${s.rate}%"></div></div>
-                <span style="font-size:12px;font-weight:700;color:var(--red)">${s.rate}%</span>
-              </div>
-            </td>
-            <td><span class="streak-badge">${s.absCount}</span></td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>`;
-    } else {
-      badge2.innerHTML = `<span class="dash-ok-badge">✓ جميعهم بخير</span>`;
-      riskEl.innerHTML = `<div class="dash-empty">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        <p>لا يوجد طلاب تجاوزوا حد الغياب 🎉</p></div>`;
-    }
-
-    // ── 3. إحصاء الشعب ──
+    // ── 2. انضباط الطلاب حسب الشعبة ──
     const secEl = document.getElementById('sectionStatsContainer');
-    if(data.sectionStats && data.sectionStats.length > 0){
+    if(noData || !data.sectionStats || data.sectionStats.length === 0){
+      secEl.innerHTML = `<div class="dash-empty"><p>لا توجد بيانات</p></div>`;
+    } else {
       secEl.innerHTML = `<table class="risk-table">
-        <thead><tr><th>#</th><th>الشعبة</th><th>عدد الطلاب</th><th>نسبة الحضور</th></tr></thead>
+        <thead><tr><th>#</th><th>الشعبة</th><th>طلاب</th><th>نسبة الحضور</th></tr></thead>
         <tbody>${data.sectionStats.map((s,i)=>{
-          const cls = s.presRate>=85?'g':s.presRate>=70?'y':'r';
-          const numCls = i===0?'gold':'';
+          const barColor = s.presRate>=85?'var(--green)':s.presRate>=70?'#f59e0b':'var(--red)';
           return `<tr>
-            <td><span class="section-rank-num ${numCls}">${i+1}</span></td>
+            <td><span class="section-rank-num ${i===0?'gold':''}">${i+1}</span></td>
             <td><strong>شعبة ${s.name}</strong></td>
-            <td style="text-align:center">${s.total}</td>
+            <td style="text-align:center;font-size:13px">${s.total}</td>
             <td>
               <div class="rate-bar-wrap">
-                <div class="rate-bar"><div class="rate-bar-fill ${cls}" style="width:${s.presRate}%"></div></div>
-                <span style="font-size:12px;font-weight:700">${s.presRate}%</span>
+                <div class="rate-bar"><div class="rate-bar-fill" style="width:${s.presRate}%;background:${barColor}"></div></div>
+                <span style="font-size:13px;font-weight:800;color:${barColor}">${s.presRate}%</span>
               </div>
             </td>
           </tr>`;
         }).join('')}</tbody>
       </table>`;
-    } else {
-      secEl.innerHTML = `<div class="dash-empty"><p>لا توجد بيانات</p></div>`;
-    }
-
-    // ── 4. آخر 7 أيام ──
-    const daysEl  = document.getElementById('recentDaysContainer');
-    const dayNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-    if(data.recentDays && data.recentDays.length > 0){
-      daysEl.innerHTML = data.recentDays.slice().reverse().map(d=>{
-        const cls = d.rate>=85?'g':d.rate>=70?'y':'r';
-        return `<div class="day-row">
-          <span class="day-label">${d.label}</span>
-          <span class="day-name">${dayNames[d.dayOfWeek]||''}</span>
-          <div class="rate-bar" style="flex:1"><div class="rate-bar-fill ${cls}" style="width:${d.rate}%"></div></div>
-          <span class="day-rate-num" style="color:${d.rate>=85?'var(--green)':d.rate>=70?'#f59e0b':'var(--red)'}">${d.rate}%</span>
-        </div>`;
-      }).join('');
-    } else {
-      daysEl.innerHTML = `<div class="dash-empty"><p>لا توجد بيانات</p></div>`;
-    }
-
-    // ── 5. الأكثر غياباً ──
-    const topEl = document.getElementById('topAbsentContainer');
-    if(data.topAbsent && data.topAbsent.length > 0){
-      topEl.innerHTML = `<table class="risk-table">
-        <thead><tr><th>#</th><th>الاسم</th><th>الشعبة</th><th>أيام غياب</th></tr></thead>
-        <tbody>${data.topAbsent.map((s,i)=>`
-          <tr>
-            <td><span class="section-rank-num ${i===0?'gold':''}">${i+1}</span></td>
-            <td><strong>${s.name}</strong></td>
-            <td>شعبة ${s.section}</td>
-            <td><span class="streak-badge">${s.count} يوم</span></td>
-          </tr>`).join('')}</tbody>
-      </table>`;
-    } else {
-      topEl.innerHTML = `<div class="dash-empty"><p>🎉 لا يوجد غياب مسجل</p></div>`;
     }
   }
 
-  function updateChartsTheme(){} // لم نعد نستخدم مخططات
+  function updateChartsTheme(){}
 
+  /* ════════════════════════════════════════════════════════════════
+     NEW STUDENT MODAL
+     ════════════════════════════════════════════════════════════════ */
+  function openAddStudentModal(){
+    // إعادة ضبط النموذج
+    ['nsName','nsParentName','nsSpecialty','nsPhone','nsParentPhone'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.value = '';
+    });
+    ['nsGender','nsStudyType'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.value = '';
+    });
+    const bd = document.getElementById('nsBirthDate');
+    if(bd) bd.value = '';
+    document.getElementById('nsFormBody').classList.remove('gone');
+    document.getElementById('nsSuccessBox').classList.add('gone');
+    document.getElementById('nsFooter').classList.remove('gone');
+    document.getElementById('newStudentOverlay').classList.remove('gone');
+  }
+
+  function closeAddStudentModal(){
+    document.getElementById('newStudentOverlay').classList.add('gone');
+  }
+
+  function submitNewStudent(){
+    const name       = (document.getElementById('nsName').value||'').trim();
+    const gender     = document.getElementById('nsGender').value;
+    const parentName = (document.getElementById('nsParentName').value||'').trim();
+    const birthDate  = document.getElementById('nsBirthDate').value;
+    const studyType  = document.getElementById('nsStudyType').value;
+    const specialty  = (document.getElementById('nsSpecialty').value||'').trim();
+    const phone      = (document.getElementById('nsPhone').value||'').trim();
+    const parentPhone= (document.getElementById('nsParentPhone').value||'').trim();
+
+    if(!name){ alert('الاسم الثلاثي مطلوب'); return; }
+    if(!gender){ alert('الجنس مطلوب'); return; }
+    if(!parentName){ alert('اسم وليّ الأمر مطلوب'); return; }
+
+    const btn = document.querySelector('.ns-submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<div class="spin" style="width:16px;height:16px;border-width:2px;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> جاري الحفظ…`;
+
+    gasCall('addNewStudent', { name, gender, parentName, birthDate, studyType, specialty, phone, parentPhone })
+      .then(() => {
+        btn.disabled = false;
+        btn.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> تسجيل الطالب`;
+        document.getElementById('nsFormBody').classList.add('gone');
+        document.getElementById('nsFooter').classList.add('gone');
+        document.getElementById('nsSuccessName').textContent = name;
+        document.getElementById('nsSuccessBox').classList.remove('gone');
+        // إغلاق تلقائي بعد 2.5 ثانية
+        setTimeout(closeAddStudentModal, 2500);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> تسجيل الطالب`;
+        showMsg('خطأ: ' + e.message, false);
+      });
+  }
   /* ════════════════════════════════════════════════════════════════
      LONG PRESS + CONTEXT MENU
      ════════════════════════════════════════════════════════════════ */
@@ -2566,8 +2763,16 @@
      ════════════════════════════════════ */
   function switchTab(tab){
     activeTab = tab;
+    // تحديث التبويبات القديمة (ديسكتوب)
     document.getElementById('tab-p').className = 'tab '+(tab==='present'?'ag':'');
     document.getElementById('tab-a').className = 'tab '+(tab==='absent'?'ar':'');
+    // تحديث الشريط الجانبي (موبايل)
+    const sp = document.getElementById('sideTabP');
+    const sa = document.getElementById('sideTabA');
+    if(sp && sa){
+      sp.className = 'side-tab present-tab' + (tab==='present' ? '' : ' inactive');
+      sa.className = 'side-tab absent-tab'  + (tab==='absent'  ? '' : ' inactive');
+    }
     filterAndRender();
   }
 
@@ -2591,6 +2796,8 @@
     set('stat-p', fP.length); set('stat-a', fA.length);
     set('pct-p', Math.round(fP.length/tot*100)+'%');
     set('pct-a', Math.round(fA.length/tot*100)+'%');
+    // أرقام الشريط الجانبي
+    set('stp-n', fP.length); set('sta-n', fA.length);
 
     const cp = document.getElementById('col-p');
     const ca = document.getElementById('col-a');
@@ -2601,6 +2808,10 @@
       cp.classList.remove('gone');
       ca.classList.remove('gone');
     }
+
+    // إظهار/إخفاء الشريط الجانبي
+    const sideTabs = document.getElementById('sideTabs');
+    if(sideTabs) sideTabs.style.display = mob ? 'flex' : 'none';
 
     render('presentList', fP, 'g', 'present');
     render('absentList',  fA, 'r', 'absent');
